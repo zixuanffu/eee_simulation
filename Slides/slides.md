@@ -1,6 +1,6 @@
 ---
 marp: true
-theme: default
+theme:  default
 _class: lead
 paginate: true
 backgroundColor: #fff
@@ -149,10 +149,15 @@ $$D(x,x^2,\ldots,x^d;\lambda_0,\ldots,\lambda_d)$$
 
 ----
 ## Consistency
+
 The adversarial estimator is consistent if the estimated loss $\mathbb{M}_\theta(\hat{D}_\theta)$ converges uniformly to the oracle loss $\mathbb{M}_\theta({D}_\theta)$ and $\hat{\theta}$ finds a global minimizer.
+
+**The next 3 statistical properties are derived under parametric specification of the generator $G(z;\theta)$.**
+--
 
 ## Rate of convergence
 $$h(\hat{\theta}, \theta_0) = O^*_P(n^{-1/2})$$
+
 ---
 
 ## Asymptotic distribution
@@ -169,9 +174,62 @@ $$\sqrt{n}(\hat{\theta} - \theta_0) = I_{\theta_0}^{-1} \sqrt{n}(P_0 - P_{\theta
 
 ----
 
-# Discussion
+# GANs in Economics
+
+In the paper by Athey et al. (2021),  
+> Using Wasserstein Generative Adversarial Networks for the design of Monte Carlo simulations
+
+Why $G$ is also trained using NNs? 
+
+This is because the objective is to **simulate data** that resembles the real data from a field experiment (LaLonde, 1986).
+
+The focus is **not structural estimation** with interpretable parameters. But to **evaluate different estimators** of average treatment effect by **lots of replications.**
+
+---
+## Simulation 
+
+For example, we want to evaluate three estimators,
+
+$$\hat{\tau}^\text{cm},\hat{\tau}^\text{ht}, \hat{\tau}^\text{dr}$$
+
+Given **one true data set** (field experiment), we can have
+
+| Experimental       | estimate | s.e. |
+| ------------------ | -------- | ---- |
+| **$\hat{\tau}^1$** | 1.79     | 0.63 |
+| **$\hat{\tau}^2$** | 2.12     | 0.88 |
+| **$\hat{\tau}^3$** | 1.79     | 0.57 |
+
+----
+
+##  Compare Estimators
+
+They simulate 2000 replications (each with 1 million units) and compute the **RMSE, Bias, SDev, and Coverage** of the 95% confidence interval.
+
+| Method             | RMSE | Bias  | SDev | Coverage |
+| ------------------ | ---- | ----- | ---- | -------- |
+| **$\hat{\tau}^1$** | 0.49 | 0.06  | 0.48 | 0.94     |
+| **$\hat{\tau}^2$** | 0.58 | 0.00  | 0.58 | 0.96     |
+| **$\hat{\tau}^3$** | 0.52 | -0.06 | 0.51 | 0.88     |
+
+----
+
+# Coding
 
 
+----
+<div align="center">
+
+# Thanks! :satisfied:
+
+![bg 40%](https://poloclub.github.io/ganlab/figures/figure-animated-ring.gif)
+
+</div> 
+
+
+<!-- ![bg 60% ](https://miro.medium.com/v2/resize:fit:1400/1*jDPj5v3JKGRRRyDZmQTkpQ.gif) -->
+
+<!-- ![bg 50% ](https://lilianweng.github.io/posts/2017-08-20-gan/GAN.png) -->
 
 <!-- ----
 - Perfect $D$: $D(x) = 1$ if $x$ is real, $D(x) = 0$ if $x$ is fake.
@@ -187,9 +245,9 @@ $$\sqrt{n}(\hat{\theta} - \theta_0) = I_{\theta_0}^{-1} \sqrt{n}(P_0 - P_{\theta
   
 
 
-<!-- | symbol     | meaning        | distribution         |
-| ---------- | -------------- | -------------------- |
-| $x_r$      | real data      | $p_r$                |
-| $x_g$ | generated data | $p_g$                | -->
+| <!--  | symbol         | meaning | distribution |
+| ----- | -------------- | ------- |
+| $x_r$ | real data      | $p_r$   |
+| $x_g$ | generated data | $p_g$   | -->          |
 
 

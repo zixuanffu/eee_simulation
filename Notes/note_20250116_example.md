@@ -13,7 +13,7 @@ Yet of course, in reality, the discriminator doesn't know the true distribution 
 
 Let's impose a form of the discriminator. 
 
-$$D(x;\lambda) = \Lambda(\lambda_0 -2\log(1+e^{-x}+2\log(1+e^{-x+\lambda_1}))$$ 
+$$D(x;\lambda) = \Lambda(\lambda_0 -2\log(1+e^{-x})+2\log(1+e^{-x+\lambda_1}))$$ 
 The discriminator is parametrized by $\lambda = (\lambda_0, \lambda_1)$
 
 The training of the discriminator boils down to finding the optimal $\lambda$ that maminizes the entropy.
