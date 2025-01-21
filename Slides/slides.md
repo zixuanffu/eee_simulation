@@ -218,7 +218,7 @@ They simulate 2000 replications (each with 1 million units) and compute the **RM
 The Wasserstein distance is a measure of the distance between two probability distributions over a metric space.
 
 ----
-## GANs in Finance
+# GANs in Finance
 
 Paper by Xu et al. 
 > Using generative adversarial networks to synthesize artificial financial datasets
@@ -280,23 +280,5 @@ My goal is to replicate in `Python`.
 
 <!-- ![bg 50% ](https://lilianweng.github.io/posts/2017-08-20-gan/GAN.png) -->
 
-<!-- ----
-- Perfect $D$: $D(x) = 1$ if $x$ is real, $D(x) = 0$ if $x$ is fake.
-- Oracle $D$: $D(x) = \frac{p_r(x)}{p_r(x) + p_g(x)}$.
-- Correctly specified $D$
-- Neural network $D$  -->
-
-
-
-<!-- > Suppose that for every open $G \subseteq \Theta$ containing $\theta_0$, we have $\inf_{\theta \not\in G} M_\theta(D_\theta) > M_{\theta_0}(D_{\theta_0})$, that $\{ \log D_\theta : \theta \in \Theta \}$ and $\{ \log(1 - D_\theta) \circ T_\theta : \theta \in \Theta \}$ are $P_0$- and $P_Z$-Glivenko–Cantelli, respectively, that $\sup_{\theta \in \Theta} |M_\theta(\hat{D}_\theta) - M_\theta(D_\theta)| \to 0$ in probability, and that $\hat{\theta}$ satisfies $M_{\hat{\theta}}(\hat{D}_{\hat{\theta}}) \leq \inf_{\theta \in \Theta} M_\theta(\hat{D}_\theta) + o_P(1).$ Then $h(\hat{\theta}, \theta_0) \to 0$ in probability. -->
-
-
-  
-
-
-| <!--  | symbol         | meaning | distribution |
-| ----- | -------------- | ------- |
-| $x_r$ | real data      | $p_r$   |
-| $x_g$ | generated data | $p_g$   | -->          |
 
 
