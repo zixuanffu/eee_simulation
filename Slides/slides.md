@@ -213,11 +213,60 @@ They simulate 2000 replications (each with 1 million units) and compute the **RM
 | **$\hat{\tau}^3$** | 0.52 | -0.06 | 0.51 | 0.88     |
 
 ----
+# Wasserstein Distance
 
-# Coding
-
+The Wasserstein distance is a measure of the distance between two probability distributions over a metric space.
 
 ----
+## GANs in Finance
+
+Paper by Xu et al. 
+> Using generative adversarial networks to synthesize artificial financial datasets
+
+This paper evaluate the performance of GANs as a means to generate synthetic financial data.
+
+To preserve the unique properties of financial data while maintaining customers’ privacy, generating synthetic or artificial data can be a good way to address this problem.
+
+----
+
+The authors applied the following criteria to evaluate the generator:
+
+1. Distributions of individual features in generated data match those in real data 
+
+2. Overall distributions of generated and real data match each other 
+
+3. Relationship between features and the target variable in real data is replicated in generated data
+ 
+----
+
+Looking at the histogram (Figure 4 in the paper), GANs were able to reproduce discrete distributions just as good as continues ones, and that for some continuous variables GANs tended to produce slightly smoothed versions of their distributions.
+
+![](../Figures/Figure4.png)
+
+----
+
+To test relationship between features and target variable in real and generated data, the authors compared two supervised ML models: 
+- one trained on real data,
+- another one trained on data produced by GAN. 
+  
+![](../Figures/Table2.png)
+
+<!-- AUC scores (in Table 2) were calculated for ground truth target values and predictions obtained from the models trained on real and generated datasets. These scores to be close enough to assume that our GAN model replicated the relationship between the target variables and the features with good accuracy. -->
+
+<!-- Overall, the authors conclude that GANs can learn and accurately reproduce intricate features distribution and relationships between features of real modeling data. -->
+
+----
+
+# Coding
+![w:9in](../Figures/run_time.png)
+My goal is to replicate in `Python`.
+
+- Well developed libraries: `PyTorch`.
+- Parrallel.
+- GPU.
+
+----
+
 <div align="center">
 
 # Thanks! :satisfied:
