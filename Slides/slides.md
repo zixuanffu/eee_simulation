@@ -33,18 +33,22 @@ It consists of two *players*:
 The two *players* play against each other in the following sense. 
 $$
 \min_G \max_D L(D, G) 
-= \mathbb{E}_{x \sim p_{r}(x)} [\log D(x)] + \mathbb{E}_{x \sim p_g(x)} [\log(1 - D(x))]
+= \mathbb{E}_{x_r \sim p_{r}(x)} [\log D(x_r)] + \mathbb{E}_{x_g \sim p_g(x)} [\log(1 - D(x_g))]
 $$
+Empirically,
+$$L(D, G)=\frac{1}{n} \sum_{i=1}^n \log D(x_i) + \frac{1}{m} \sum_{j=1}^m \log (1-D(x_j))$$
 ----
 ## Discriminator
 Let's fix $G$ first.   
 Given a $\lambda$, $D(x;\lambda)$ gives the probability that $x$ is real.
 
-Notice that $L(D,G)$ is between 
+Notice that $\frac{1}{n} \sum_{i=1}^n \log D(x_i) + \frac{1}{m} \sum_{j=1}^m \log (1-D(x_j))$ 
+is between 
 - $-\log 2$: when $D(x) = 0.5$ for all $x$.
 - $0$: when $D(x) = 1$ for real data and $D(x) = 0$ for generated data.
+- Oracle loss: $D(x) = p_r(x)/(p_r(x)+p_g(x))$.
   
-![bg left:40% 70%](https://poloclub.github.io/ganlab/figures/figure-discriminator-heatmap.png)
+![bg left:30% 70%](https://poloclub.github.io/ganlab/figures/figure-discriminator-heatmap.png)
 
 
 ----
@@ -95,10 +99,12 @@ $D$ is trained using Neural Networks, while $G$ is not. While in the original GA
 # MLE
 
 $$\min_\theta L_\theta =  -\frac{1}{2n} \sum_{i=1}^n \log p(x_i;\theta)$$
+where $p(x;\theta)$ is the probability of observing the real data $x$.
 
 # AdE
 
 $$ \min_\theta M_\theta(D) = \frac{1}{n} \sum_{i=1}^n \log D(x_i) + \frac{1}{m} \sum_{i=1}^m \log (1-D(G_{\theta}(Z_i)))$$
+where $D(x;\lambda)$ is the probability assigned by the discriminator that $x$ is real.
 
 ---- 
 # SMM
@@ -125,6 +131,15 @@ $$p(x)=\Lambda(x-\theta) (1-\Lambda(x-\theta))$$
 In AdE,
 $$D(x;\lambda_0,\lambda_1)$$
 
+We plot the **$L_\theta$ against $M_\theta(D)$**.
+
+
+---
+
+> An intuition behind efﬁciency is that the curvature of $M_\theta(\hat{D}_\theta)$ at $\theta_0$ is proportional to the Fisher information. First, the curvature of $L_\theta$ is a quarter of the Fisher information, and so is the curvature of the oracle loss $M_\theta(D_\theta)$.
+
+<br>
+
 ![bg:](../Figures/MLE_AdE.png)
 
 ---- 
@@ -136,10 +151,13 @@ $$\mathbb{E}_{X}(f(X|\theta)) = \theta \quad f(X|\theta)\in \mathbb{R}^d$$
 In AdE,
 $$D(x,x^2,\ldots,x^d;\lambda_0,\ldots,\lambda_d)$$
 
+We plot **$L_\theta$ against $M_\theta(D)$**.
+
+---
+
 ![bg:](../Figures/SMM_AdE.png)
 
-----
-# Moments: $\mathbb{R}^d$
+---
 
 ![bg:](../Figures/SMM_AdE_2.png)
 
@@ -161,6 +179,7 @@ $$h(\hat{\theta}, \theta_0) = O^*_P(n^{-1/2})$$
 ---
 
 ## Asymptotic distribution
+
 $$
 \sqrt{n}(\hat{\theta} - \theta_0) = 2 \tilde{I}_{\theta_0}^{-1} \sqrt{n} \left[ P_0(1 - D_{\theta_0}) \dot{\ell}_{\theta_0} 
 - P_0 D_{\theta_0} \dot{\ell}_{\theta_0} - \tilde{P}_0 \tau_n \right] + o_P^*(1) \rightsquigarrow N(0, \tilde{I}_{\theta_0}^{-1} V \tilde{I}_{\theta_0}^{-1}),
@@ -274,6 +293,26 @@ My goal is to replicate in `Python`.
 ![bg 40%](https://poloclub.github.io/ganlab/figures/figure-animated-ring.gif)
 
 </div> 
+
+---
+# Appendix
+
+
+
+- $D^\theta$ has good properties but is infeasible as we do not know $f_\theta(X)$.
+- $\mathcal{D} = \mathcal{D}^\mathcal{N}$: multi-layer NN as a nonparametric (sieve) estimator of $D^\theta$.
+- **Result**: under *regularity conditions*, when using an appropriately chosen multi-layer NN as a discriminator, and as $N/H \to 0$:
+  $$
+  \sqrt{N} (\hat{\theta}_G - \theta_G^0) \to N(0, I_{\theta_0}^{-1}),
+  $$
+  where $I_{\theta_0}^{-1}$ is the information matrix.
+---
+
+- There are three main steps to obtain this result:
+  1. Rate of convergence of the discriminator: $o_p(N^{-1/4})$,
+  2. Rate of convergence of the objective functions: $o_p(N^{-1/2})$,
+  3. Rate of convergence of $\hat{\theta}$: $O_p(N^{-1/2})$.
+
 
 
 <!-- ![bg 60% ](https://miro.medium.com/v2/resize:fit:1400/1*jDPj5v3JKGRRRyDZmQTkpQ.gif) -->
