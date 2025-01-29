@@ -21,8 +21,8 @@
 % \setlength{\parindent}{0pt} % remove the automatic indentation
 
 \title{\textbf{An Adversarial Approach to Structural Estimation}}
-\author{TETSUYA KAJI, ELENA MANRESA, GUILLAUME POULIOT}
-\date{Zixuan, Huixin}
+\author{Tetsuya Kaji \and Elena Manresa \and Guillaume Pouliot}
+\date{Presented by Zixuan, Huixin}
 
 \begin{document}
 \maketitle
@@ -32,166 +32,240 @@
 % \end{abstract}
 
 % \newpage
-\thispagestyle{empty}
-\tableofcontents
+% \thispagestyle{empty}
+% \tableofcontents
 % \newpage
 
 % \setcounter{page}{1}
 
 \section{Adversarial Framework} \label{sec:framework}
-In this section, we layout the basic framework of the adversarial approach.
-Such adversarial (min-max zero-sum game) is not new, yet the
-implementation/adaptation of it in generative tasks (e.g., image generation),
-first proposed by \citet{goodfellow2014}, was shown to perform really well
-under different settings. By training iteratively (back and forth) a
-discriminator that tries to distinguish fake from true, and a generator that
-reacts by producing harder-to-distinguish fake data, the algorithm can generate
-new objects that closely resembles the existing ones. The mathematical form of
-the game can be written as the following:
-\begin{equation*}
+
+\citet{kaji2023adversarial} propose a simulation-based method of estimation. From my understanding, this method is a specific case of the more general Generative Adversarial Networks (GANs) framework, with the restriction that the data-generating process is characterized by a structural model. Since there are existing simulation-based methods such as Simulated Method of Moments (SMM) and Simulation Maximum Likelihood (SML), the paper contributes to this strand of literature by both making comparison of performance and deriving formal statistical results. To provide a thorough understanding of \citet{kaji2023adversarial}, we will first delve into a detailed explanation of the ideas underlying GANs.
+
+\subsection{Mathematical Formulation} \label{subsec:math_formulation}
+In this section, we lay out the basic mathematical framework of the adversarial
+approach. While adversarial min-max zero-sum games are not new, their
+implementation and adaptation in generative tasks—such as image generation—were
+first proposed by \citet{goodfellow2014generative} and have been shown to
+perform exceptionally well under various settings. By iteratively training a
+discriminator that attempts to distinguish real data from fake data, and a
+generator that responds by producing increasingly realistic synthetic data, the
+algorithm can generate new objects that closely resemble existing ones. The
+mathematical formulation of this game is as follows:
+\begin{equation} \label{eq:gan_objective}
     \min_G \max_D L(D, G)
-    = \mathbb{E}_{x_r \sim p_{r}(x)} [\log D(x_r)] + \mathbb{E}_{x_g \sim p_g(x)} [\log(1 - D(x_g))]
-\end{equation*}
-Empirically, the loss function is
+    = \mathbb{E}_{x_r \sim p_{r}(x)} [\log D(x_r)] + \mathbb{E}_{x_g \sim p_g(x)} [\log(1 - D(x_g))].
+\end{equation}
+Empirically, the loss function is:
 \begin{equation}\label{eq:empirical_loss}
-    L(D, G)=\frac{1}{n} \sum_{i=1}^n \log D(x_i) + \frac{1}{m} \sum_{j=1}^m \log (1-D(x_j))
+    L(D, G) = \frac{1}{n} \sum_{i=1}^n \log D(x_i) + \frac{1}{m} \sum_{j=1}^m \log (1-D(x_j)).
 \end{equation}
 
-Instead of directly explaining the objective function of the problem. I will
-disentangle the problem from left to right. From this expression, we can see
-that there are two things we want to optimize over, the discriminator $D$ and
-the generator $G$.
+Rather than directly explaining the objective function, I will disentangle the
+problem step by step. From the above expression, we can see that there are two
+components to optimize: the discriminator \(D\) and the generator \(G\).
 
-The way that generator works is by taking some input noise $z\sim p_z(z)$ and
-mapping it to the data space $x_g = G(z)$. Since we know the input noise
-distribution $p_z(z)$ (usually normal or uniform), as well as the function
-$G(\dot)$, we can compute the distribution of the generated data $p_g(x)$. Up
-til this point, we have at our hands two sets of data points, one is fake whose
-distribution $p_g$ we know of, the other real whose distribution $p_r$ we have
-no clue of.
+The generator works by taking input noise \(z \sim p_z(z)\) and mapping it to
+the data space via \(x_g = G(z)\). Since we know the input noise distribution
+\(p_z(z)\) (typically normal or uniform) as well as the function \(G(\cdot)\),
+we can compute the distribution of the generated data \(p_g(x)\). At this
+point, we have two sets of data points: one synthetic, with a known
+distribution \(p_g\), and one real, with an unknown distribution \(p_r\).
 
-Given a set of points $\set{x_r}_i$ and $\set{x_g}_i$, how can we train a
-classification model that can distinguish between the two? That is to say, take
-the value of one data $x$, the classifier $D$ outputs a value between 0 and 1.
-A \textit{good} classifier should output a value closer to 1 when the input is
-real, and closer to 0 when the input is fake.
+Given sets of points \(\{x_r\}_i\) and \(\{x_g\}_i\), how can we train a
+classification model to distinguish between them? Specifically, for a given
+data point \(x\), the classifier \(D\) outputs a value between 0 and 1. A
+\textit{good} classifier should output values closer to 1 for real data and
+closer to 0 for synthetic data.
 
-Recall that to train a \textit{good} \textbf{classifier}, the usual objective
-function is the cross-entropy loss (equivalent to log-likelihood). The
-following is a review of the cross entropy between two distribution $x~p$ and
-$x~q$, defined as
+Recall that training a \textit{good} classifier typically involves minimizing
+the cross-entropy loss, which is equivalent to maximizing the log-likelihood.
+The cross-entropy between two distributions \(p\) and \(q\) is defined as:
 \begin{equation*}
-    H(p, q) = -\mathbb{E}_p[\log(q)]
+    H(p, q) = -\mathbb{E}_p[\log q].
 \end{equation*}
-In the context of binary classification, for a given point $x_i$ with label $y_i$, the cross entropy loss is
+In the context of binary classification, for a given point \(x_i\) with label \(y_i\), the cross-entropy loss is:
 \begin{equation*}
-    H(p, q) = - \pa{ p(x\in \text{Real}) \log q(x\in \text{Real}) + p(x\in \text{Fake})\log q(x\in \text{Fake})} = -(y_i \log D(x_i) + (1-y_i) \log (1-D(x_i)))
+    \begin{split}
+        H(p, q) & = - \left( p(x \in \text{Real}) \log q(x \in \text{Real}) + p(x \in \text{Fake}) \log q(x \in \text{Fake}) \right) \\
+                & = -\left(y_i \log D(x_i) + (1-y_i) \log (1-D(x_i))\right).
+    \end{split}
 \end{equation*}
-Summing over all points $n+m$, we have
+Summing over all \(n + m\) points, we obtain:
 \begin{equation*}
-    -\frac{1}{m+n}\sum_i y_i \log D(x_i) + (1-y_i) \log (1-D(x_i))
+    -\frac{1}{m+n}\sum_i \left( y_i \log D(x_i) + (1-y_i) \log (1-D(x_i)) \right).
 \end{equation*}
-This is the cross entropy loss of the classifier, which is equivalent to the log-likelihood function.
-Notice that this is not exactly the same as the $L(D, G)$ defined above \ref{eq:empirical_loss} which puts different weights on the two true and fake points with weights $m:n$.
+This is the cross-entropy loss of the classifier, which is equivalent to the log-likelihood function. Note that this is not identical to the adversarial loss \(L(D, G)\) defined in Equation~\eqref{eq:empirical_loss}, which assigns different weights to real and synthetic points based on their counts \(m\) and \(n\).
 
-The reason why I am detailing the training out is that later we will be
-comparing the objective function MLE, AdE and SMM. I was initially confused
-about the difference between the MLE and AdE because the inner maximization
-function of AdE looks almost the same as the log-likelihood objective of MLE.
-Yet they are doing completely different things. While MLE is directly
-maximizing the likelihood of observing the real data to find the true
-parameters, the AdE's inner likelihood maximizing is only an intermediate step
-to push the generator to find the true parameters. Details will be given
-section \ref{sec:comparison}.
+The reason for detailing this training process is that later we will compare
+the objective functions of maximum likelihood estimation (MLE), adversarial
+estimation (AdE), and simulated method of moments (SMM). Initially, I was
+confused about the difference between MLE and AdE because the inner
+maximization function of AdE closely resembles the log-likelihood objective of
+MLE. However, they serve entirely different purposes. While MLE directly
+maximizes the likelihood of observing the real data to estimate the true
+parameters, the inner likelihood maximization in AdE is an intermediate step
+that pushes the generator to recover the true parameters. Further details will
+be provided in Section~\ref{subsec:comparison}.
 
-Having said that, let's take the given cross-entropy loss $L(G,D)$ and see how
-its value changes as we choose different $D$ and $G$.
-
-Notice that the empirical cross entropy loss is
-
-Now I examine how the value of $L(D, G)$ changes as we update $D$ and $G$.
-First, let us fix $G \equiv p_g$. We examine how the choice of $D$ affects the
-value of $L(D, G)$. I summarize them into the following 4 cases.
+With this in mind, let us analyze how the cross-entropy loss \(L(G, D)\)
+changes as we vary \(D\) and \(G\). First, fix \(G \equiv p_g\) and examine how
+the choice of \(D\) affects \(L(D, G)\). I summarize the key cases as follows:
 \begin{itemize}
-    \item Perfect $D$: $D(x_i)$ assigns value 1 to all $x_i \in p_r$ and 0 to all $x_i
-              \in p_g$. In this case, $D(x)$ is not a valid function because for two points
-          $x_1=x_2$ where $x_1 \in p_r$ and $x_2 \in p_g$, the discriminator
-          \textit{predicts} $D(x_1)=1$ and $D(x_2)=0$. However, this perfect classifier
-          gives the upper bound of the loss as 0.
-    \item Ignorant $D$: $D(x_i)$ assigns value $\frac{1}{2}$ to all $x_i$. In this case,
-          this is lower bound which is $\log \frac{1}{2} + \log \frac{1}{2} = -2\log 2$.
-    \item Oracle $D$: $D(x_i)=\frac{p_r(x_i)}{p_r(x_i)+p_g(x_i)}$. This is the optimal
-          discriminator derived by taking derivative of $L(D, G)$ with respect to $D$, or
-          we can simply view it as posterior probability of $x_i$ being real with equal
-          prior $1/2$. If the discriminator knows the distribution $p_r(x;\theta_0)$ and
-          $p_g(x;\theta)$, this is the optimal discriminator.
-    \item Correctly specified $D$: $D(x_i;\lambda)$ is a correctly specified
-          discriminator if there exists a $\lambda^*$ such that
-          $D(x_i;\lambda^*)=\frac{p_r(x_i;\theta_0)}{p_r(x_i;\theta_0)+p_g(x_i;\theta)}$.
-          In this case, the convergence of $D(x_i;\lambda)$ to the oracle
-          $D(x_i:\lambda^*)$ is guaranteed.
-    \item Flexible $D$: In reality, neither the oracle nor the correctly specified $D$ is
-          available. It is often the case that we take a flexible parametric form of $D$,
-          for example $D(x)=\Lambda(\lambda_0+\lambda_1 x+\lambda_2 x^2+\cdots)$. Or we
-          can go to the flexibility extreme and train a neural network classifier to
-          approximate the oracle $D$. The convergence of $D_\text{NN}$ to the oracle $D$
-          is proved in \citet{}.
+    \item \textbf{Perfect \(D\)}: \(D(x_i)\) assigns a value of 1 to all \(x_i \in p_r\) and 0 to all \(x_i \in p_g\). In this case, \(D(x)\) is not a valid function because for two points \(x_1 = x_2\) where \(x_1 \in p_r\) and \(x_2 \in p_g\), the discriminator predicts \(D(x_1) = 1\) and \(D(x_2) = 0\). However, this perfect classifier provides an upper bound for the loss, which is 0.
+    \item \textbf{Ignorant \(D\)}: \(D(x_i)\) assigns a value of \(\frac{1}{2}\) to all \(x_i\). In this case, the loss achieves its lower bound, which is \(\log \frac{1}{2} + \log \frac{1}{2} = -2\log 2\).
+    \item \textbf{Oracle \(D\)}: \(D(x_i) = \frac{p_r(x_i)}{p_r(x_i) + p_g(x_i)}\). This is the optimal discriminator, derived by taking the derivative of \(L(D, G)\) with respect to \(D\). Alternatively, it can be interpreted as the posterior probability of \(x_i\) being real, assuming equal priors of \(\frac{1}{2}\). If the discriminator knows the distributions \(p_r(x; \theta_0)\) and \(p_g(x; \theta)\), this is the optimal discriminator.
+    \item \textbf{Correctly Specified \(D\)}: \(D(x_i; \lambda)\) is correctly specified if there exists a \(\lambda^*\) such that \(D(x_i; \lambda^*) = \frac{p_r(x_i; \theta_0)}{p_r(x_i; \theta_0) + p_g(x_i; \theta)}\). In this case, the convergence of \(D(x_i; \lambda)\) to the oracle \(D(x_i; \lambda^*)\) is guaranteed.
+    \item \textbf{Flexible \(D\)}: In practice, neither the oracle nor the correctly specified \(D\) is available. Instead, we often use a flexible parametric form for \(D\), such as \(D(x) = \Lambda(\lambda_0 + \lambda_1 x + \lambda_2 x^2 + \cdots)\). Alternatively, we can use a neural network classifier to approximate the oracle \(D\). The convergence of \(D_\text{NN}\) to the oracle \(D\) is proved in \citet{}.
 \end{itemize}
 
-Let us fix the discriminator $D$ and examine how the choice of $G$ affects the
-value of $L(D, G)$. Notice that the optimal discriminator is
-$D(x_i)=\frac{p_r(x_i)}{p_r(x_i)+p_g(x_i)}$. The optimal generator in this case
-is $G(z)\sim p_r(x)$ rendering the oracle $D$ same as the ignorant $D$
-\footnote{$G$ is saying to $D$: I heard that you have learned something, no
-    longer an ignorant young kid, but an oracle? Let me fool you again.}. If the
-discriminator and the generator are both at its best, the loss function is
-$-2\log 2$.
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.4\textwidth]{../Figures/Discriminator.png}
+    \caption{The real data points are in green, the fake data points are in purple. The grid color is greener when $D(x)$ is closer to 1, and more purple when closer to 0. Source: \citet{kahng2018gan}}
+    \label{fig:discriminator}
+\end{figure}
 
-For the part of training $G$, if the true distribution $p_r$ is parametric,
-e.g., a logistic distribution parametrized by location and scale. The training
-of $G$ boils down to estimating the true $\theta_0$ that characterizes the true
-distribution $p_r$. If our structural model comes with some parameters $\theta$
-wiht the true $\theta_0$ corresponding to the one that produces the observed
-data. The generator is trained as an estimator for $\theta_0$. In the following
-section, we denote the adversarial generator estimator as AdE. One may have
-noticed that if our focus is the generator, the discriminator can be regarded
-as a nuisance intermediate step. Though we call it nuisance, it is crucial in
-determining the performance of the AdE, including both the convergence rate and
-the asymptotic distribution and efficiency. This will be further discussed in
-section \ref{sec:performance}.
+Next, fix the discriminator \(D\) and examine how the choice of \(G\) affects
+\(L(D, G)\). Note that the optimal discriminator is \(D(x_i) =
+\frac{p_r(x_i)}{p_r(x_i) + p_g(x_i)}\). The optimal generator in this case is
+\(G(z) \sim p_r(x)\), which renders the oracle \(D\) equivalent to the ignorant
+\(D\)\footnote{Here, \(G\) is essentially saying to \(D\): "I heard you've
+    learned something and are no longer an ignorant young kid, but an oracle? Let
+    me fool you again."}. If both the discriminator and the generator are at their
+optimal states, the loss function evaluates to \(-2\log 2\).
 
-Note that in the estimation of structure parameters, $G$ is parametric. While
-in the original GAN, $G$ is trained using Neural network as well. This is
-purely as a result of the different task at hands. If our goal is to generate
-data that mimics the true data, neural network is certainly a better choice
-than restrictive parametric assumption. However, if our goal is to estimate the
-distribution of the true data (rather than generating something new), the
-parametric assumption gives us the value that we can interpret in an economic
-sense.
+\subsection{Algorithm} \label{subsec:algorithm}
 
-The next section~\ref{sec:related_applications} will discuss the two
-applications of GAN in Economics and Finance with similar objective of
+For ease of exposition, we first assume that $G(z;\theta)$ and $D(x;\lambda)$
+are parametrized by $\theta$ and $\lambda$, respectively. We summarize it in an
+oversimplified way \footnote{Refer to this paper \citet{kaji2023adversarial} or
+    the original one \citet{goodfellow2014generative} for the detailed algorithm in
+    pseudocode} as follows: One may resort to Figure~\ref{fig:algorithm} for a
+visual representation of the algorithm.
+\begin{enumerate}
+    \item Initialize $\theta^0$ and $\lambda^0$.
+    \item While $\theta^k$ has not converged:
+          \begin{enumerate}
+              \item Generate $x_g$ from $G(z;\theta^k)$.
+              \item Train $D(x;\lambda)$ till convergence with $\{x_r\}$ and $\{x^k_g\}$. Update
+                    $\lambda^{k+1}$.
+              \item Compute the $L(D_{\lambda^{k+1}},G_{\theta^k})$.
+              \item Minimize $L(D_{\lambda^{k+1}},G_{\theta^k})$ with respect to $\theta$. Update
+                    $\theta^{k+1}$.
+          \end{enumerate}
+\end{enumerate}
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../Figures/Algorithm.png}
+    \caption{The upper-right loop represents the training of $D$ in the step 2.b while the bottom loop represents the training of $G$ in step 2. Source: \citet{kahng2018gan}}
+    \label{fig:algorithm}
+\end{figure}
+
+When training \(G\), if the true distribution \(p_r\) is parametric (e.g., a
+logistic distribution parameterized by location and scale), the training of
+\(G\) reduces to estimating the true parameter \(\theta_0\) that characterizes
+\(p_r\). If our structural model includes parameters \(\theta\) with the true
+value \(\theta_0\) corresponding to the one that generates the observed data,
+the generator is trained as an estimator for \(\theta_0\). In the following
+section, we denote this adversarial generator estimator as AdE. One may notice
+that if the focus is on the generator, the discriminator can be regarded as a
+nuisance intermediate step. However, despite being labeled as a nuisance, the
+discriminator plays a crucial role in determining the performance of AdE,
+including its convergence rate, asymptotic distribution, and efficiency. This
+will be further discussed in Section~\ref{sec:performance}.
+
+It is worth noting that in structural parameter estimation, \(G\) is typically
+parametric, whereas in the original GAN framework, \(G\) is often implemented
+using a neural network. This distinction arises from the different objectives
+of the tasks. If the goal is to generate data that mimics the true data, a
+neural network is a better choice than a restrictive parametric assumption.
+However, if the goal is to estimate the distribution of the true data (rather
+than generating new data), the parametric assumption provides interpretable
+parameters that are meaningful in an economic context.
+
+The next section~\ref{sec:related_applications} will discuss two applications
+of GANs in economics and finance, both of which share the objective of
 generating new data.
 
 \section{Related Applications} \label{sec:related_applications}
 
-The first paper that applies the WGAN in Economcics is \citet{}. Instead of
-generating images that can fool the human's eyes, the authors wants to generate
-new samples that looks like the data collected from a costly experiment. For
-example, xxx's experiment provides researchers with one real sample of n
-individuals. The researcher can apply different estiamtors to estimate the
-average treatment effect. However, when it comes to evaluate the performance of
-estimators, ususally it would require monte carlo simulation of many samples.
-More often than not, the credibility of the practice is called into question
-due to the specific design of the simulation. One estimator may perform better
-only as a result of that particular simulation setup. The author then proposes
-WGAN
+\subsection{GANs in Economics}
+The first paper to apply Wasserstein Generative Adversarial Networks (WGANs) in
+economics is \citet{athey2024using}. Unlike traditional GANs, which aim to
+generate images that can fool human perception, the authors propose using GANs
+to generate synthetic samples that resemble data collected from costly
+experiments. For example, consider a program that use conditional subsidy to
+encourage school enrollment. The experiment provides researchers with a single
+real sample of \(n\) individuals. Researchers can apply various estimators to
+this sample to estimate the average treatment effect. However, when
+\textbf{evaluating the performance of these estimators}, it is typically
+necessary to conduct Monte Carlo simulations using many synthetic samples.
+Often, the credibility of such simulations is questioned due to the specific
+design choices made in the simulation setup. For instance, an estimator may
+appear to perform better solely because of the particular simulation design. To
+address this issue, the authors propose using GANs to generate a large of
+number of synthetic samples based on which we can evaluate the estimators.
+
+With only one real sample, we can obtain the Estimate and s.e. columns of
+Table~\ref{tab:estimator_comparison}. By simulating 2000 replications of the
+sample using GANs, it is possible to evaluate the RMSE, Bias, and Coverage of
+the estimators.
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|l|c|c|c|c|c|}
+        \hline
+        \textbf{Method} & \textbf{Estimate} & \textbf{s.e.} & \textbf{RMSE} & \textbf{Bias} & \textbf{Coverage} \\
+        \hline
+        $\hat{\tau}^1$  & 1.79              & 0.63          & 0.49          & 0.06          & 0.94              \\
+        $\hat{\tau}^2$  & 2.12              & 0.88          & 0.58          & 0.00          & 0.96              \\
+        $\hat{\tau}^3$  & 1.79              & 0.57          & 0.52          & -0.06         & 0.88              \\
+        \hline
+    \end{tabular}
+    \caption{Comparison of estimators using one true data set and simulation results.}
+    \label{tab:estimator_comparison}
+\end{table}
+
+In addition to the difference in the objective of \citet{athey2024using} which
+is to generate data, and that of \citet{kaji2023adversarial} which is to
+estimate parameters, the former uses WGANs, an improved version of GANs that
+uses the Wasserstein distance to measure the difference between the real $p_r$
+and generated distribution $p_g$.
+
+\paragraph{From JS divergence to Wasserstein Distance}
+Recall the GANs objective function~ref{eq:gan_objective}. If we plug in the
+oracle discriminator $D_\text{oracle}$, we get
+\begin{equation*}
+    \begin{split}
+        L(G,D_\text{oracle}) & = \int p_r(x) \log \frac{p_r(x)}{p_r(x) + p_g(x)} + p_g(x) \log \frac{p_g(x)}{p_r(x) + p_g(x)} dx \\
+                             & = 2 L_{JS}(p_r, p_g) - 2 \log 2
+    \end{split}
+\end{equation*}
+That is to say, if the discriminator can be trained to approximately the oracle, the loss function the generator faces is the Jensen-Shannon divergence between the real distribution and generated distribution. Yet there are problems with the JS divergence such as non-meaningful divergence value $\infty$ when the support of $p_r$ and $p_g$ are not overlapping. The Wasserstein distance, on the other hand, provide a meaningful measure of distance between the two under all circumstances.
+To see this, we write the loss function in JS divergence and Wasserstein distance respectively:
+\begin{align}
+     & \min_G \max_D L(G,D) = \min_G (2 L_{JS}(p_r, p_g) - 2 \log 2)                                                                                                        \\
+     & \min_G \max_D L(G,D) = \min_G W(p_r, p_g)                     & = \min_G \max_{w \in W} \mathbb{E}_{x_r \sim p_r}[f_w(x_r)] - \mathbb{E}_{x_g \sim p_g(x)}[f_w(x_g)] \\
+     &                                                               & = \min_G \max_{w \in W} \int \left(p_r(x)-p_g(x) \right)f_w(x) dx
+\end{align}
+where $\set{f_w}_{w\in W}$ is a set of K-Lipschitz continuous functions.
+In this case, the training of $D$ is not to find a good classifier but to find a function $f_w$ that can well approximate the Wasserstein distance between $p_r$ and $p_g$. The explanation follows closely that of \citet{weng2017gan}.
 
 \section{Performance} \label{sec:performance}
+\subsection{Statistical Properties} \label{subsec:statistical_properties}
+\paragraph{Consistency}
+\paragraph{Rate of Convergence}
+\paragraph{Asymptotic Distribution}
+\paragraph{Efficiency}
+
+\subsection{Comparison} \label{subsec:comparison}
+\subsection{Discussion} \label{subsec:discussion}
 
 \section{Computation} \label{sec:computation}
 \pagebreak
 \newpage
-\bibliography{../References/ref.bib}
+\bibliography{ref.bib}
 
 \end{document}
