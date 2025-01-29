@@ -68,6 +68,19 @@ $$f(X)=X^\text{order} \quad G(Z|\theta) = \theta + Z$$
 
 Note that one should estimate the optimal weighting matrix $\Omega$ in SMM.
 
+### SML (Simulated Maximum Likelihood)
+
+The likelihood function is
+$$\min_\theta L_\theta =  -\frac{1}{2n} \sum_{i=1}^n \log p(x_i;\theta)$$
+
+Since we don't have a closed form of the likelihood function, we simulate it by 
+$$ E_Z[f(x_i,G(Z);\theta)]=p(x_i;\theta) $$
+where $p(x_i;\theta)$ is the likelihood of observing the real data and $f(x_i,G(Z);\theta)$ is the likelihood of observing the real data **and** the generated data.
+
+Then the objective function is 
+$$\min_\theta L^s_\theta =  -\frac{1}{2n} \sum_{i=1}^n \log \left[\frac{1}{m} \sum_{j=1}^m f(x_i,G(Z_j);\theta)\right]$$
+
+*Remark*: an unbiased estimator of likelihood $p$ is not an unbiased estimator of the log-likelihood $\log p$.
 Now let's compare the three objective function 
 #### MLE
 $$ \min_\theta L_\theta =  -\frac{1}{2n} \sum_{i=1}^n \log p(x_i;\theta)$$

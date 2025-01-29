@@ -1,0 +1,114 @@
+% \renewcommand{\familydefault}{\sfdefault}
+\newcommand{\indep}{\perp\!\!\!\!\perp} % the independent symbol
+
+% define theorem
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{assumption}{Assumption}[subsection]
+% define definition style
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{property}{Property}[section]
+\newtheorem{example}{Example}[section]
+\newtheorem*{exercise}{Exercise}
+% define remark style
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\newtheorem{question}{Question}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Rd}{\mathbb{R}^d}
+\newcommand{\Hy}{\mathbb{H}}
+\newcommand{\calh}{\mathcal{H}}
+\newcommand{\cala}{\mathcal{A}}
+\newcommand{\calm}{\mathcal{M}}
+\newcommand{\cald}{\mathcal{D}}
+\newcommand{\caln}{\mathcal{N}}
+\newcommand{\calr}{\mathcal{R}}
+\newcommand{\calz}{\mathcal{Z}}
+\newcommand{\caly}{\mathcal{Y}}
+\newcommand{\calq}{\mathcal{Q}}
+\newcommand{\cale}{\mathcal{E}}
+\newcommand{\cali}{\mathcal{I}}
+\newcommand{\calb}{\mathcal{B}}
+\newcommand{\calc}{\mathcal{C}}
+\newcommand{\calw}{\mathcal{W}}
+\newcommand{\calg}{\mathcal{G}}
+\newcommand{\calu}{\mathcal{U}}
+\newcommand{\calo}{\mathcal{O}}
+\newcommand{\calp}{\mathcal{P}}
+\newcommand{\vect}{\mathrm{vect}}
+\newcommand{\cov}{\mathrm{cov}}
+\newcommand{\reff}{\mathrm{ref}}
+
+\newcommand{\setbra}[1]{\left\{#1\right\}}
+\newcommand{\set}[1]{\setbra{#1}}
+\newcommand{\bra}[1]{\left[#1\right]}
+\newcommand{\pa}[1]{\left(#1\right)}
+\newcommand{\abs}[1]{\left| #1\right|}
+\newcommand{\norm}[1]{\left\| #1 \right\|}
+\newcommand{\angs}[1]{\left\langle #1\right\rangle}
+\newcommand{\midvert}{\middle|}
+
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Lip}{\mathrm{Lip}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Cpx}{\mathbb{C}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\V}{\mathbb{V}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\p}{\mathbb{P}}
+\newcommand{\F}{\mathcal{F}}
+%\newcommand{\G}{\mathcal{G}}
+\newcommand{\diag}{\mathrm{diag}}
+\newcommand{\id}{\mathrm{id}}
+\newcommand{\one}{\mathbbm{1}}
+\newcommand{\defeq}{\overset{\mathrm{def}}{=}}
+\newcommand{\nlr}{\nleftrightarrow}
+\newcommand{\lr}{\leftrightarrow}
+\newcommand{\ra}{\rightarrow}
+\newcommand{\tr}{\mathrm{tr}}
+\newcommand{\pspace}{(\Omega, \F, \p)}
+\newcommand{\filt}{\pa{\F_t}_{0\leq t\leq \infty}}
+\newcommand{\filtnat}{\pa{\F_t^X}_{0\leq t\leq \infty}}
+\newcommand{\filtspace}{\pa{\Omega, \F, \filt, \p}}
+\newcommand{\indist}[1]{\overset{d}{#1}}
+\newcommand{\inlo}[1]{\overset{L^1}{#1}}
+\newcommand{\inltwo}[1]{\overset{L^2}{#1}}
+\newcommand{\inp}[1]{\overset{\p}{#1}}
+\newcommand{\inpc}{\overset{\p}{\rightarrow}}
+\newcommand{\indistc}{\indist{\rightarrow}}
+\newcommand{\inas}[1]{\overset{\mathrm{a.s.}}{#1}}
+\newcommand{\inhy}[1]{\overset{\mathrm{\Hy^2}}{#1}}
+\newcommand{\cc}[1]{\mathrm{CC}\left(#1 \right)}
+\newcommand{\partfrac}[1]{\frac{\partial}{\partial #1}} \newcommand{\Chi}{\mathcal{X}} \newcommand{\tl}{{T,\Lambda}}
+\newcommand{\isingspace}{\{\pm\}^\Lambda} \newcommand{\boltzmeas}{\mu_\tl}
+\newcommand{\bl}{{\beta, \Lambda}} \newcommand{\zerot}{{t\in [0,T]}}
+\newcommand{\tgez}{{t\geq 0}} \newcommand{\brown}{(B_t)_\tgez}
+\newcommand{\process}{(X_t)_\tgez} \newcommand{\smallising}[4]{\begin{matrix} #1&#2\\#3&#4\end{matrix}}
+\def\ci{\perp\!\!\!\!\perp}
+\newcommand{\parm}{{(m)}} \newcommand{\diff}{\mathrm{d}} \newcommand{\optp}{\mathrm{opt}_\p}
+\newcommand{\erp}{\mathrm{er}_\p} \newcommand{\er}{\mathrm{er}}
+\newcommand{\sgn}{\mathrm{sgn}} \DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\esssup}{ess\,sup}
+\DeclareMathOperator*{\essinf}{ess\,inf} \newcommand{\vcdim}{\mathrm{VCdim}}
+\newcommand{\bigargs}{\pa{\bar{Y}_t,M_t,\theta_t}}
+\newcommand{\bigargsm}{\pa{\bar{Y}_{t-},M_{t-},\theta_{t-}}}
+\newcommand{\smallargs}{\pa{\bar{y},m,\vartheta}}
+\newcommand{\smallarg}{\pa{m,\vartheta}}
+
+\newcommand{\fatone}{\mathbf{1}}
+\newcommand{\pen}{\mathrm{pen}}
+\newcommand{\MF}{\mathrm{MF}}
+\newcommand{\opt}{\mathrm{opt}}
+\newcommand{\MSE}{\mathrm{MSE}}
+\newcommand{\MISE}{\mathrm{MISE}}
+\newcommand{\CV}{\mathrm{CV}}
+
+\newcommand{\1}{\mathbbm{1}}
+\newenvironment{sol}{\begin{proof}[Solution]}{\end{proof}}
+
