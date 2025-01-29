@@ -208,10 +208,10 @@ appear to perform better solely because of the particular simulation design. To
 address this issue, the authors propose using GANs to generate a large of
 number of synthetic samples based on which we can evaluate the estimators.
 
-With only one real sample, we can obtain the Estimate and s.e. columns of
-Table~\ref{tab:estimator_comparison}. By simulating 2000 replications of the
-sample using GANs, it is possible to evaluate the RMSE, Bias, and Coverage of
-the estimators.
+With only one real sample, we can obtain the \textbf{Estimate} and
+\textbf{s.e.} columns of Table~\ref{tab:estimator_comparison}. By simulating
+2000 replications of the sample using GANs, it is possible to evaluate the
+\textbf{RMSE}, \textbf{Bias}, and \textbf{Coverage} of the estimators.
 
 \begin{table}[h!]
     \centering
@@ -224,44 +224,118 @@ the estimators.
         $\hat{\tau}^3$  & 1.79              & 0.57          & 0.52          & -0.06         & 0.88              \\
         \hline
     \end{tabular}
-    \caption{Comparison of estimators using one true data set and simulation results.}
+    \caption{Comparison of estimators.}
     \label{tab:estimator_comparison}
 \end{table}
 
-In addition to the difference in the objective of \citet{athey2024using} which
-is to generate data, and that of \citet{kaji2023adversarial} which is to
-estimate parameters, the former uses WGANs, an improved version of GANs that
-uses the Wasserstein distance to measure the difference between the real $p_r$
-and generated distribution $p_g$.
+In addition to the difference in objectives---\citet{athey2024using} focus on
+generating data, while \citet{kaji2023adversarial} focus on estimating
+parameters---the former uses Wasserstein Generative Adversarial Networks
+(WGANs), an improved version of GANs that employs the Wasserstein distance to
+measure the difference between the real distribution \(p_r\) and the generated
+distribution \(p_g\).
 
-\paragraph{From JS divergence to Wasserstein Distance}
-Recall the GANs objective function~ref{eq:gan_objective}. If we plug in the
-oracle discriminator $D_\text{oracle}$, we get
+\paragraph{From JS Divergence to Wasserstein Distance}
+Recall the GANs objective function in Equation~\ref{eq:gan_objective}. If we
+substitute the oracle discriminator \(D_\text{oracle}\), we obtain:
 \begin{equation*}
     \begin{split}
-        L(G,D_\text{oracle}) & = \int p_r(x) \log \frac{p_r(x)}{p_r(x) + p_g(x)} + p_g(x) \log \frac{p_g(x)}{p_r(x) + p_g(x)} dx \\
-                             & = 2 L_{JS}(p_r, p_g) - 2 \log 2
+        L(G, D_\text{oracle}) & = \int p_r(x) \log \frac{p_r(x)}{p_r(x) + p_g(x)} + p_g(x) \log \frac{p_g(x)}{p_r(x) + p_g(x)} \, dx \\
+                              & = 2 L_{JS}(p_r, p_g) - 2 \log 2,
     \end{split}
 \end{equation*}
-That is to say, if the discriminator can be trained to approximately the oracle, the loss function the generator faces is the Jensen-Shannon divergence between the real distribution and generated distribution. Yet there are problems with the JS divergence such as non-meaningful divergence value $\infty$ when the support of $p_r$ and $p_g$ are not overlapping. The Wasserstein distance, on the other hand, provide a meaningful measure of distance between the two under all circumstances.
-To see this, we write the loss function in JS divergence and Wasserstein distance respectively:
+where \(L_{JS}(p_r, p_g)\) is the Jensen-Shannon (JS) divergence between the real and generated distributions. This implies that if the discriminator approximates the oracle, the generator's loss function reduces to the JS divergence between \(p_r\) and \(p_g\). However, the JS divergence has limitations, such as producing non-meaningful divergence values (e.g., \(\infty\)) when the supports of \(p_r\) and \(p_g\) do not overlap. In contrast, the Wasserstein distance provides a meaningful measure of distance between distributions under all circumstances.
+
+To illustrate this, we compare the loss functions for JS divergence and
+Wasserstein distance:
 \begin{align}
-     & \min_G \max_D L(G,D) = \min_G (2 L_{JS}(p_r, p_g) - 2 \log 2)                                                                                                        \\
-     & \min_G \max_D L(G,D) = \min_G W(p_r, p_g)                     & = \min_G \max_{w \in W} \mathbb{E}_{x_r \sim p_r}[f_w(x_r)] - \mathbb{E}_{x_g \sim p_g(x)}[f_w(x_g)] \\
-     &                                                               & = \min_G \max_{w \in W} \int \left(p_r(x)-p_g(x) \right)f_w(x) dx
+    \min_G \max_D L(G, D) & = \min_G (2 L_{JS}(p_r, p_g) - 2 \log 2), \label{eq:js_loss}                                                                          \\
+    \min_G \max_D L(G, D) & = \min_G W(p_r, p_g) \nonumber                                                                                                        \\
+                          & = \min_G \max_{w \in W} \left( \mathbb{E}_{x_r \sim p_r}[f_w(x_r)] - \mathbb{E}_{x_g \sim p_g(x)}[f_w(x_g)] \right) \label{eq:w_loss} \\
+                          & = \min_G \max_{w \in W} \int \left(p_r(x) - p_g(x)\right) f_w(x) \, dx, \nonumber
 \end{align}
-where $\set{f_w}_{w\in W}$ is a set of K-Lipschitz continuous functions.
-In this case, the training of $D$ is not to find a good classifier but to find a function $f_w$ that can well approximate the Wasserstein distance between $p_r$ and $p_g$. The explanation follows closely that of \citet{weng2017gan}.
+where \(\{f_w\}_{w \in W}\) is a family of \(K\)-Lipschitz continuous functions. In this formulation, the discriminator's role is not to classify but to approximate a function \(f_w\) that captures the Wasserstein distance between \(p_r\) and \(p_g\). This explanation closely follows \citet{weng2017gan}, which provides a more detailed explanation of the Wasserstein GANs and its dual formulation.
+
+The algorithm should follow the same structure as in
+Figure~\ref{fig:algorithm}, but with modified loss function in
+Equation~\eqref{eq:w_loss}.
+
+It would be interesting to see how the Wasserstein GANs perform in the context
+of structural estimation. This could be a potential extension of
+\citet{kaji2023adversarial}. However, it may be the case that it is not so much
+improvment to apply WGAN to economics context since we are not working with
+objects like images that often have non-overlapping supports.
+
+\subsection{GANs in Finance}
 
 \section{Performance} \label{sec:performance}
+
 \subsection{Statistical Properties} \label{subsec:statistical_properties}
+
+The adversarial estimator proposed in this paper exhibits several desirable
+statistical properties, including consistency, a parametric rate of
+convergence, asymptotic normality, and efficiency under correct specification.
+These properties are established under a set of assumptions that ensure the
+estimator behaves well in both finite and large samples.
+
 \paragraph{Consistency}
+The adversarial estimator \(\hat{\theta}\) is consistent for the true parameter
+\(\theta_0\). This result relies on the population objective function
+\(M_\theta(D_\theta)\) being uniquely minimized at \(\theta_0\), ensuring
+identification. Additionally, the classes of functions \(\{\log D_\theta\}\)
+and \(\{\log(1 - D_\theta) \circ T_\theta\}\) must satisfy uniform convergence
+conditions, guaranteeing that the sample objective function
+\(\mathbb{M}_\theta(\hat{D}_\theta)\) converges uniformly to its population
+counterpart. Finally, the estimator \(\hat{\theta}\) must approximately
+minimize \(\mathbb{M}_\theta(\hat{D}_\theta)\). Under these conditions,
+\(\hat{\theta}\) converges in probability to \(\theta_0\) as the sample size
+grows.
+
 \paragraph{Rate of Convergence}
+The estimator achieves the parametric \(\sqrt{n}\)-rate of convergence under
+several key assumptions. First, the structural model \(P_\theta\) must be
+parametric, smooth, and identifiable. Second, the synthetic sample size \(m\)
+must grow faster than the actual sample size \(n\) (\(m/n \to \infty\)),
+ensuring that the simulated data does not introduce excessive noise. Third, the
+estimation of the discriminator must satisfy an orthogonality condition,
+meaning that errors in estimating the discriminator do not affect the
+convergence rate of the generator. Finally, the population loss
+\(M_\theta(D_\theta)\) must exhibit quadratic curvature near \(\theta_0\),
+ensuring that the objective function is well-behaved locally. Under these
+assumptions, the Hellinger distance \(h(\hat{\theta}, \theta_0)\) converges at
+the rate \(O_p(n^{-1/2})\).
+
 \paragraph{Asymptotic Distribution}
+Under correct specification and regularity conditions, the adversarial
+estimator is asymptotically normal. Specifically, the scaled estimation error
+\(\sqrt{n}(\hat{\theta} - \theta_0)\) converges in distribution to a normal
+random variable with mean zero and variance given by \(\frac{1}{4}
+\bar{I}_{\theta_0}^{-1} V \bar{I}_{\theta_0}^{-1}\), where \(V = \lim
+4P_{\theta_0}[D_{\theta_0}(1 -
+        D_{\theta_0})\dot{\ell}_{\theta_0}\dot{\ell}_{\theta_0}^\top]\) and
+\(\bar{I}_{\theta_0}\) is the Hessian curvature of the population loss. This
+result highlights the dependence of the asymptotic variance on the
+discriminator’s ability to approximate the oracle discriminator \(D_\theta\).
+
 \paragraph{Efficiency}
+When the structural model is correctly specified, the adversarial estimator
+achieves efficiency. In this case, the asymptotic variance reduces to the
+inverse Fisher information \(I_{\theta_0}^{-1}\), matching the Cramér-Rao
+bound. This result holds when the synthetic sample size \(m\) grows much faster
+than \(n\) (\(m \gg n\)), ensuring that the simulated data does not introduce
+additional variability. Thus, under correct specification, the adversarial
+estimator is as efficient as the maximum likelihood estimator (MLE).
 
 \subsection{Comparison} \label{subsec:comparison}
+
+Given the statistical properties stated above, the paper illustrate the
+performance using a simple example.
 \subsection{Discussion} \label{subsec:discussion}
+
+- Why use GANs?
+- Why is it superior to SMM and SML or MLE?
+- Computation overhead?
+- Is there a package that one can utilize to implement the method?
 
 \section{Computation} \label{sec:computation}
 \pagebreak
