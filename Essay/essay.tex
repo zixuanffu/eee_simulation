@@ -278,58 +278,158 @@ convergence, asymptotic normality, and efficiency under correct specification.
 These properties are established under a set of assumptions that ensure the
 estimator behaves well in both finite and large samples.
 
-\paragraph{Consistency}
-The adversarial estimator \(\hat{\theta}\) is consistent for the true parameter
-\(\theta_0\). This result relies on the population objective function
-\(M_\theta(D_\theta)\) being uniquely minimized at \(\theta_0\), ensuring
-identification. Additionally, the classes of functions \(\{\log D_\theta\}\)
-and \(\{\log(1 - D_\theta) \circ T_\theta\}\) must satisfy uniform convergence
-conditions, guaranteeing that the sample objective function
-\(\mathbb{M}_\theta(\hat{D}_\theta)\) converges uniformly to its population
-counterpart. Finally, the estimator \(\hat{\theta}\) must approximately
-minimize \(\mathbb{M}_\theta(\hat{D}_\theta)\). Under these conditions,
-\(\hat{\theta}\) converges in probability to \(\theta_0\) as the sample size
-grows.
+\paragraph{Consistency (Theorem 1)} The adversarial estimator \(\hat{\theta}\) converges to \(\theta_0\) if:
+\begin{itemize}
+    \item The population loss \(M_\theta(D_\theta)\) is uniquely minimized at
+          \(\theta_0\),
+    \item The classes \(\{\log D_\theta\}\) and \(\{\log(1 - D_\theta) \circ T_\theta\}\)
+          satisfy uniform convergence,
+    \item \(\mathbb{M}_\theta(\hat{D}_\theta)\) uniformly converges to \(M_\theta(D_\theta)\),
+    \item \(\hat{\theta}\) approximately minimizes \(\mathbb{M}_\theta(\hat{D}_\theta)\).
+\end{itemize}
+\textbf{Result:} \(\hat{\theta} \xrightarrow{p} \theta_0\).
 
-\paragraph{Rate of Convergence}
-The estimator achieves the parametric \(\sqrt{n}\)-rate of convergence under
-several key assumptions. First, the structural model \(P_\theta\) must be
-parametric, smooth, and identifiable. Second, the synthetic sample size \(m\)
-must grow faster than the actual sample size \(n\) (\(m/n \to \infty\)),
-ensuring that the simulated data does not introduce excessive noise. Third, the
-estimation of the discriminator must satisfy an orthogonality condition,
-meaning that errors in estimating the discriminator do not affect the
-convergence rate of the generator. Finally, the population loss
-\(M_\theta(D_\theta)\) must exhibit quadratic curvature near \(\theta_0\),
-ensuring that the objective function is well-behaved locally. Under these
-assumptions, the Hellinger distance \(h(\hat{\theta}, \theta_0)\) converges at
-the rate \(O_p(n^{-1/2})\).
+\paragraph{Rate of Convergence (Theorem 2)} Achieves \(\sqrt{n}\)-rate under:
+\begin{itemize}
+    \item Parametric, smooth structural model (Assumption 1),
+    \item \(m/n \to \infty\) (Assumption 2),
+    \item Orthogonality of discriminator estimation (Assumption 3),
+    \item Quadratic curvature of \(M_\theta(D_\theta)\) (Assumption 4).
+\end{itemize}
+\textbf{Result:} \(h(\hat{\theta}, \theta_0) = O_p(n^{-1/2})\).
 
-\paragraph{Asymptotic Distribution}
-Under correct specification and regularity conditions, the adversarial
-estimator is asymptotically normal. Specifically, the scaled estimation error
-\(\sqrt{n}(\hat{\theta} - \theta_0)\) converges in distribution to a normal
-random variable with mean zero and variance given by \(\frac{1}{4}
-\bar{I}_{\theta_0}^{-1} V \bar{I}_{\theta_0}^{-1}\), where \(V = \lim
-4P_{\theta_0}[D_{\theta_0}(1 -
-        D_{\theta_0})\dot{\ell}_{\theta_0}\dot{\ell}_{\theta_0}^\top]\) and
-\(\bar{I}_{\theta_0}\) is the Hessian curvature of the population loss. This
-result highlights the dependence of the asymptotic variance on the
-discriminator’s ability to approximate the oracle discriminator \(D_\theta\).
+\paragraph{Asymptotic Distribution (Theorem 3)} Under regularity conditions:
+\[
+    \sqrt{n}(\hat{\theta} - \theta_0) \xrightarrow{d} N\left(0, \frac{1}{4} \bar{I}_{\theta_0}^{-1} V \bar{I}_{\theta_0}^{-1}\right),
+\]
+where \(V = \lim 4P_{\theta_0}[D_{\theta_0}(1 -
+        D_{\theta_0})\dot{\ell}_{\theta_0}\dot{\ell}_{\theta_0}^\top]\).
 
-\paragraph{Efficiency}
-When the structural model is correctly specified, the adversarial estimator
-achieves efficiency. In this case, the asymptotic variance reduces to the
-inverse Fisher information \(I_{\theta_0}^{-1}\), matching the Cramér-Rao
-bound. This result holds when the synthetic sample size \(m\) grows much faster
-than \(n\) (\(m \gg n\)), ensuring that the simulated data does not introduce
-additional variability. Thus, under correct specification, the adversarial
-estimator is as efficient as the maximum likelihood estimator (MLE).
+\paragraph{Efficiency (Corollary 4)} Under correct specification:
+\[
+    \sqrt{n}(\hat{\theta} - \theta_0) \xrightarrow{d} N(0, I_{\theta_0}^{-1}),
+\]
+achieving the Cramér-Rao bound when \(m \gg n\).
+
+% \paragraph{Practical Implications}
+% \begin{itemize}
+%     \item Use bootstrap for variance estimation with intractable likelihoods.
+%     \item A rich discriminator (e.g., neural networks) ensures efficiency.
+%     \item Orthogonality is critical to isolate discriminator estimation errors.
+% \end{itemize}
+
+% \paragraph{Consistency}
+% The adversarial estimator \(\hat{\theta}\) is consistent for the true parameter
+% \(\theta_0\). This result relies on the population objective function
+% \(M_\theta(D_\theta)\) being uniquely minimized at \(\theta_0\), ensuring
+% identification. Additionally, the classes of functions \(\{\log D_\theta\}\)
+% and \(\{\log(1 - D_\theta) \circ T_\theta\}\) must satisfy uniform convergence
+% conditions, guaranteeing that the sample objective function
+% \(\mathbb{M}_\theta(\hat{D}_\theta)\) converges uniformly to its population
+% counterpart. Finally, the estimator \(\hat{\theta}\) must approximately
+% minimize \(\mathbb{M}_\theta(\hat{D}_\theta)\). Under these conditions,
+% \(\hat{\theta}\) converges in probability to \(\theta_0\) as the sample size
+% grows.
+
+% \paragraph{Rate of Convergence}
+% The estimator achieves the parametric \(\sqrt{n}\)-rate of convergence under
+% several key assumptions. First, the structural model \(P_\theta\) must be
+% parametric, smooth, and identifiable. Second, the synthetic sample size \(m\)
+% must grow faster than the actual sample size \(n\) (\(m/n \to \infty\)),
+% ensuring that the simulated data does not introduce excessive noise. Third, the
+% estimation of the discriminator must satisfy an orthogonality condition,
+% meaning that errors in estimating the discriminator do not affect the
+% convergence rate of the generator. Finally, the population loss
+% \(M_\theta(D_\theta)\) must exhibit quadratic curvature near \(\theta_0\),
+% ensuring that the objective function is well-behaved locally. Under these
+% assumptions, the Hellinger distance \(h(\hat{\theta}, \theta_0)\) converges at
+% the rate \(O_p(n^{-1/2})\).
+
+% \paragraph{Asymptotic Distribution}
+% Under correct specification and regularity conditions, the adversarial
+% estimator is asymptotically normal. Specifically, the scaled estimation error
+% \(\sqrt{n}(\hat{\theta} - \theta_0)\) converges in distribution to a normal
+% random variable with mean zero and variance given by \(\frac{1}{4}
+% \bar{I}_{\theta_0}^{-1} V \bar{I}_{\theta_0}^{-1}\), where \(V = \lim
+% 4P_{\theta_0}[D_{\theta_0}(1 -
+%         D_{\theta_0})\dot{\ell}_{\theta_0}\dot{\ell}_{\theta_0}^\top]\) and
+% \(\bar{I}_{\theta_0}\) is the Hessian curvature of the population loss. This
+% result highlights the dependence of the asymptotic variance on the
+% discriminator’s ability to approximate the oracle discriminator \(D_\theta\).
+
+% \paragraph{Efficiency}
+% When the structural model is correctly specified, the adversarial estimator
+% achieves efficiency. In this case, the asymptotic variance reduces to the
+% inverse Fisher information \(I_{\theta_0}^{-1}\), matching the Cramér-Rao
+% bound. This result holds when the synthetic sample size \(m\) grows much faster
+% than \(n\) (\(m \gg n\)), ensuring that the simulated data does not introduce
+% additional variability. Thus, under correct specification, the adversarial
+% estimator is as efficient as the maximum likelihood estimator (MLE).
 
 \subsection{Comparison} \label{subsec:comparison}
+\begin{quote}
+    The adversarial estimator fills the gap between SMM and MLE.
+\end{quote}
+There are numerous existing methods for structural estimation. The paper compares the newly proposed method with MLE and SMM. The paper claims that AdE does not require tractible likelihood or correctly specified discriminator, nor does it suffer from the issues with increasing number of moment conditions (constraints). In the case of intractible likelihood, we want to add to the comparision the method of simulated MLE. In order to illustrate the likelihood, we will first lay out the objective functions of each method.
+\paragraph{MLE}
+\begin{equation*}
+    \min_\theta L_\theta =  -\frac{1}{2n} \sum_{i=1}^n \log p(x_i;\theta)
+\end{equation*}
+where $p(x;\theta)$ is the probability of observing the real data $x$.
+\pargraph{AdE}
+\begin{equation*}
+    \min_\theta M_\theta(D) = \frac{1}{n} \sum_{i=1}^n \log D(x_i) + \frac{1}{m} \sum_{i=1}^m \log (1-D(G_{\theta}(Z_i)))
+\end{equation*}
+where $D(x;\lambda)$ is the probability assigned by the discriminator that $x$ is real.
+Notice that even though the objective functions look somewhat similar, $p(x;\theta)$ and $D(x;\lambda)$ represent entirely different things. The former is the probability of oberving the data, the latter is the \textit{nuisance} discriminator that gives the probability of the data belonging to the real sample.
 
-Given the statistical properties stated above, the paper illustrate the
-performance using a simple example.
+\paragraph{SMM}
+Given $$\mathbb{E}_{X}(f(X|\theta)) = \theta$$ where $f(X|\theta)$ is some
+moment condition. We replace this $\theta$ with a generator $G$ such that
+$$\mathbb{E}_{Z}(G(Z|\theta)) = \theta $$ Therefore, the theoretical moment
+condition we will be using is the following $$
+    \mathbb{E}_{X}(f(X|\theta)-\mathbb{E}_{Z}(G(Z|\theta))) = 0$$ Therefore, the
+objective function of SMM is $$ \min_\theta S_\theta =
+    \left\{\frac{1}{n}\sum_i^n \left\{f(X_i)-\frac{1}{m} \sum_{j=1}^m
+    G(Z_j|\theta)\right\} \right\}^\top \Omega \left\{\frac{1}{n} \sum_i^n
+    \left\{f(X_i)-\frac{1}{m} \sum_{j=1}^m G(Z_j|\theta)\right\} \right\}$$ where
+real data has size $n$ and generated data has size $m$. Here the generator is
+not an estimator as in AdE, it is just a function that helps us to construct
+the moment condition. It is not always straightforward to find such a function
+$G$ such that the $E_{Z}(G(Z|\theta)) = \theta$.
+\paragraph{SML}
+We first learned SML as a way to deal with intractible likelihood. For example,
+when the likelihood function is $p(x|\theta)$ which is not computable. We can
+find a function $E_z(G(x,z|\theta))=p(x\theta)$
+
+The full likelihood function is
+\begin{equation*}
+    L(\theta) = \prod_{i=1}^{n} p(y_i \mid x_i; \theta)
+\end{equation*}
+Since we don't have the analytical form of the likelihood we have a function $G(y_i,x_i,z;\theta)$ such that $E_z(G(y_i,x_i,z;\theta))=p(y_i,x_i;\theta)$ Then simulate $m$ draws for each $x_i$ and $y_i$
+
+The objective function of SML is
+\begin{equation}
+    {L}_s(\theta) = \prod_{i=1}^{n} \left[ \frac{1}{m} \sum_{r=1}^{m} p(y_i \mid x_i, z_{im}; \theta) \right].
+\end{equation}
+
+Or in log form
+\begin{equation*}
+    \ell_s(\theta) = \sum_{i=1}^{n} \log \left[ \frac{1}{m} \sum_{r=1}^{m} p(y_i \mid x_i, z_{im}; \theta) \right].
+\end{equation*}
+
+\textbf{Consistency}: As $R \to \infty$ and $n \to \infty$, $\widehat{\theta}$ is consistent for $\theta$ under regularity conditions.
+
+It is well known that if the model is correctly specified, MLE is efficient
+with the smallest variance among all consistent estimators. However, MLE
+requires the likelihood function to be known and computable, which is often not
+the case in structural estimation. In contrast, optimally weighted SMM doesn't
+require any likelihood function and is consistent as the simulation sample size
+$m \to \infty$ yet suffers from a growing number of moments as documented by
+\citet{}. The SML doesn't require closed form likelihood either but would
+require that both the real sample size $n$ and the simulated sample size $m$
+goes to infinity. This Given the statistical properties stated above, the paper
+illustrate the performance using a simple example.
 \subsection{Discussion} \label{subsec:discussion}
 
 - Why use GANs?
