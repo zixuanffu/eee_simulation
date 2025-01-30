@@ -1,4 +1,6 @@
 \documentclass[12pt]{article}
+\usepackage{setspace}
+\linespread{1.2}
 \usepackage{fullpage,graphicx,psfrag,amsmath,amsfonts,verbatim}
 \usepackage[small,bf]{caption}
 \usepackage{amsthm}
@@ -370,72 +372,78 @@ achieving the Cramér-Rao bound when \(m \gg n\).
 \begin{quote}
     The adversarial estimator fills the gap between SMM and MLE.
 \end{quote}
-There are numerous existing methods for structural estimation. The paper compares the newly proposed method with MLE and SMM. The paper claims that AdE does not require tractible likelihood or correctly specified discriminator, nor does it suffer from the issues with increasing number of moment conditions (constraints). In the case of intractible likelihood, we want to add to the comparision the method of simulated MLE. In order to illustrate the likelihood, we will first lay out the objective functions of each method.
+
+There are numerous existing methods for structural estimation. This section
+compares the newly proposed adversarial estimator (AdE) with maximum likelihood
+estimation (MLE), simulated method of moments (SMM), and simulated maximum
+likelihood (SML). The paper claims that AdE does not require a tractable
+likelihood or a correctly specified discriminator, nor does it suffer from the
+issues associated with an increasing number of moment conditions. To provide a
+comprehensive comparison, we include SML as a method for handling intractable
+likelihoods. Below, we outline the objective functions of each method.
+
 \paragraph{MLE}
+The maximum likelihood estimator minimizes the negative log-likelihood:
 \begin{equation*}
-    \min_\theta L_\theta =  -\frac{1}{2n} \sum_{i=1}^n \log p(x_i;\theta)
+    \min_\theta L_\theta = -\frac{1}{n} \sum_{i=1}^n \log p(x_i; \theta),
 \end{equation*}
-where $p(x;\theta)$ is the probability of observing the real data $x$.
-\pargraph{AdE}
+where \(p(x; \theta)\) is the probability density of observing the real data \(x\) under the model parameterized by \(\theta\).
+
+\paragraph{AdE}
+The adversarial estimator minimizes the following objective:
 \begin{equation*}
-    \min_\theta M_\theta(D) = \frac{1}{n} \sum_{i=1}^n \log D(x_i) + \frac{1}{m} \sum_{i=1}^m \log (1-D(G_{\theta}(Z_i)))
+    \min_\theta M_\theta(D) = \frac{1}{n} \sum_{i=1}^n \log D(x_i) + \frac{1}{m} \sum_{j=1}^m \log \left(1 - D(G_\theta(z_j))\right),
 \end{equation*}
-where $D(x;\lambda)$ is the probability assigned by the discriminator that $x$ is real.
-Notice that even though the objective functions look somewhat similar, $p(x;\theta)$ and $D(x;\lambda)$ represent entirely different things. The former is the probability of oberving the data, the latter is the \textit{nuisance} discriminator that gives the probability of the data belonging to the real sample.
+where \(D(x; \lambda)\) is the discriminator's probability that \(x\) is real, and \(G_\theta(z)\) is the generator mapping noise \(z\) to synthetic data. Although the objective functions of MLE and AdE appear similar, \(p(x; \theta)\) and \(D(x; \lambda)\) represent fundamentally different quantities: the former is the likelihood of the data, while the latter is a discriminator estimating the probability that \(x\) belongs to the real sample.
 
 \paragraph{SMM}
-Given $$\mathbb{E}_{X}(f(X|\theta)) = \theta$$ where $f(X|\theta)$ is some
-moment condition. We replace this $\theta$ with a generator $G$ such that
-$$\mathbb{E}_{Z}(G(Z|\theta)) = \theta $$ Therefore, the theoretical moment
-condition we will be using is the following $$
-    \mathbb{E}_{X}(f(X|\theta)-\mathbb{E}_{Z}(G(Z|\theta))) = 0$$ Therefore, the
-objective function of SMM is $$ \min_\theta S_\theta =
-    \left\{\frac{1}{n}\sum_i^n \left\{f(X_i)-\frac{1}{m} \sum_{j=1}^m
-    G(Z_j|\theta)\right\} \right\}^\top \Omega \left\{\frac{1}{n} \sum_i^n
-    \left\{f(X_i)-\frac{1}{m} \sum_{j=1}^m G(Z_j|\theta)\right\} \right\}$$ where
-real data has size $n$ and generated data has size $m$. Here the generator is
-not an estimator as in AdE, it is just a function that helps us to construct
-the moment condition. It is not always straightforward to find such a function
-$G$ such that the $E_{Z}(G(Z|\theta)) = \theta$.
+The simulated method of moments relies on moment conditions of the form
+\(\mathbb{E}_X[f(X; \theta)] = \theta\), where \(f(X; \theta)\) is a moment
+function. By replacing \(\theta\) with a generator \(G\), we impose the
+condition \(\mathbb{E}_Z[G(Z; \theta)] = \theta\). The theoretical moment
+condition becomes:
+\begin{equation*}
+    \mathbb{E}_X\left[f(X; \theta) - \mathbb{E}_Z[G(Z; \theta)]\right] = 0.
+\end{equation*}
+The SMM objective function is:
+\begin{equation*}
+    \min_\theta S_\theta = \left\{\frac{1}{n}\sum_{i=1}^n \left[f(X_i) - \frac{1}{m} \sum_{j=1}^m G(Z_j; \theta)\right]\right\}^\top \Omega \left\{\frac{1}{n}\sum_{i=1}^n \left[f(X_i) - \frac{1}{m} \sum_{j=1}^m G(Z_j; \theta)\right]\right\},
+\end{equation*}
+where \(n\) and \(m\) are the sizes of the real and synthetic datasets, respectively. Consistency of SMM estimator requires $n\to\infty$ while holding $m$ fixed. Unlike AdE, the generator \(G\) in SMM is not an estimator but a function used to construct moment conditions. Finding such a generator \(G\) that satisfies \(\mathbb{E}_Z[G(Z; \theta)] = \theta\) can be challenging.
+
 \paragraph{SML}
-We first learned SML as a way to deal with intractible likelihood. For example,
-when the likelihood function is $p(x|\theta)$ which is not computable. We can
-find a function $E_z(G(x,z|\theta))=p(x\theta)$
-
-The full likelihood function is
+Simulated maximum likelihood (SML) addresses intractable likelihoods by
+approximating the likelihood function. Suppose the likelihood \(p(x; \theta)\)
+is not analytically computable. We introduce a function \(G(x, z; \theta)\)
+such that \(\mathbb{E}_z[G(x, z; \theta)] = p(x; \theta)\). Or we consider a
+more general form with both $y_i$ and $x_i$. Since \(p(y_i \mid x_i; \theta)\)
+is intractable, we simulate \(m\) draws \(z_{ir}\) for each \((x_i, y_i)\) and
+approximate the likelihood as:
 \begin{equation*}
-    L(\theta) = \prod_{i=1}^{n} p(y_i \mid x_i; \theta)
+    L_s(\theta) = \prod_{i=1}^n \left[\frac{1}{m} \sum_{r=1}^m G(y_i \mid x_i, z_{ir}; \theta)\right].
 \end{equation*}
-Since we don't have the analytical form of the likelihood we have a function $G(y_i,x_i,z;\theta)$ such that $E_z(G(y_i,x_i,z;\theta))=p(y_i,x_i;\theta)$ Then simulate $m$ draws for each $x_i$ and $y_i$
-
-The objective function of SML is
-\begin{equation}
-    {L}_s(\theta) = \prod_{i=1}^{n} \left[ \frac{1}{m} \sum_{r=1}^{m} p(y_i \mid x_i, z_{im}; \theta) \right].
-\end{equation}
-
-Or in log form
+In log form, the SML objective becomes:
 \begin{equation*}
-    \ell_s(\theta) = \sum_{i=1}^{n} \log \left[ \frac{1}{m} \sum_{r=1}^{m} p(y_i \mid x_i, z_{im}; \theta) \right].
+    \ell_s(\theta) = \sum_{i=1}^n \log \left[\frac{1}{m} \sum_{r=1}^m G(y_i \mid x_i, z_{ir}; \theta)\right].
 \end{equation*}
+Under regularity conditions, the SML estimator \(\hat{\theta}\) is consistent as \(m \to \infty\) and \(n \to \infty\). Comparing the consistency
 
-\textbf{Consistency}: As $R \to \infty$ and $n \to \infty$, $\widehat{\theta}$ is consistent for $\theta$ under regularity conditions.
-
-It is well known that if the model is correctly specified, MLE is efficient
-with the smallest variance among all consistent estimators. However, MLE
-requires the likelihood function to be known and computable, which is often not
-the case in structural estimation. In contrast, optimally weighted SMM doesn't
-require any likelihood function and is consistent as the simulation sample size
-$m \to \infty$ yet suffers from a growing number of moments as documented by
-\citet{}. The SML doesn't require closed form likelihood either but would
-require that both the real sample size $n$ and the simulated sample size $m$
-goes to infinity. This Given the statistical properties stated above, the paper
-illustrate the performance using a simple example.
+% It is well known that if the model is correctly specified, MLE is efficient
+% with the smallest variance among all consistent estimators. However, MLE
+% requires the likelihood function to be known and computable, which is often not
+% the case in structural estimation. In contrast, optimally weighted SMM doesn't
+% require any likelihood function and is consistent as the simulation sample size
+% $m \to \infty$ yet suffers from a growing number of moments as documented by
+% \citet{}. The SML doesn't require closed form likelihood either but would
+% require that both the real sample size $n$ and the simulated sample size $m$
+% goes to infinity. This Given the statistical properties stated above, the paper
+% illustrate the performance using a simple example.
 \subsection{Discussion} \label{subsec:discussion}
 
-- Why use GANs?
-- Why is it superior to SMM and SML or MLE?
-- Computation overhead?
-- Is there a package that one can utilize to implement the method?
+% - Why use GANs?
+% - Why is it superior to SMM and SML or MLE?
+% - Computation overhead?
+% - Is there a package that one can utilize to implement the method?
 
 \section{Computation} \label{sec:computation}
 \pagebreak
