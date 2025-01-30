@@ -313,61 +313,6 @@ where \(V = \lim 4P_{\theta_0}[D_{\theta_0}(1 -
 \]
 achieving the Cramér-Rao bound when \(m \gg n\).
 
-% \paragraph{Practical Implications}
-% \begin{itemize}
-%     \item Use bootstrap for variance estimation with intractable likelihoods.
-%     \item A rich discriminator (e.g., neural networks) ensures efficiency.
-%     \item Orthogonality is critical to isolate discriminator estimation errors.
-% \end{itemize}
-
-% \paragraph{Consistency}
-% The adversarial estimator \(\hat{\theta}\) is consistent for the true parameter
-% \(\theta_0\). This result relies on the population objective function
-% \(M_\theta(D_\theta)\) being uniquely minimized at \(\theta_0\), ensuring
-% identification. Additionally, the classes of functions \(\{\log D_\theta\}\)
-% and \(\{\log(1 - D_\theta) \circ T_\theta\}\) must satisfy uniform convergence
-% conditions, guaranteeing that the sample objective function
-% \(\mathbb{M}_\theta(\hat{D}_\theta)\) converges uniformly to its population
-% counterpart. Finally, the estimator \(\hat{\theta}\) must approximately
-% minimize \(\mathbb{M}_\theta(\hat{D}_\theta)\). Under these conditions,
-% \(\hat{\theta}\) converges in probability to \(\theta_0\) as the sample size
-% grows.
-
-% \paragraph{Rate of Convergence}
-% The estimator achieves the parametric \(\sqrt{n}\)-rate of convergence under
-% several key assumptions. First, the structural model \(P_\theta\) must be
-% parametric, smooth, and identifiable. Second, the synthetic sample size \(m\)
-% must grow faster than the actual sample size \(n\) (\(m/n \to \infty\)),
-% ensuring that the simulated data does not introduce excessive noise. Third, the
-% estimation of the discriminator must satisfy an orthogonality condition,
-% meaning that errors in estimating the discriminator do not affect the
-% convergence rate of the generator. Finally, the population loss
-% \(M_\theta(D_\theta)\) must exhibit quadratic curvature near \(\theta_0\),
-% ensuring that the objective function is well-behaved locally. Under these
-% assumptions, the Hellinger distance \(h(\hat{\theta}, \theta_0)\) converges at
-% the rate \(O_p(n^{-1/2})\).
-
-% \paragraph{Asymptotic Distribution}
-% Under correct specification and regularity conditions, the adversarial
-% estimator is asymptotically normal. Specifically, the scaled estimation error
-% \(\sqrt{n}(\hat{\theta} - \theta_0)\) converges in distribution to a normal
-% random variable with mean zero and variance given by \(\frac{1}{4}
-% \bar{I}_{\theta_0}^{-1} V \bar{I}_{\theta_0}^{-1}\), where \(V = \lim
-% 4P_{\theta_0}[D_{\theta_0}(1 -
-%         D_{\theta_0})\dot{\ell}_{\theta_0}\dot{\ell}_{\theta_0}^\top]\) and
-% \(\bar{I}_{\theta_0}\) is the Hessian curvature of the population loss. This
-% result highlights the dependence of the asymptotic variance on the
-% discriminator’s ability to approximate the oracle discriminator \(D_\theta\).
-
-% \paragraph{Efficiency}
-% When the structural model is correctly specified, the adversarial estimator
-% achieves efficiency. In this case, the asymptotic variance reduces to the
-% inverse Fisher information \(I_{\theta_0}^{-1}\), matching the Cramér-Rao
-% bound. This result holds when the synthetic sample size \(m\) grows much faster
-% than \(n\) (\(m \gg n\)), ensuring that the simulated data does not introduce
-% additional variability. Thus, under correct specification, the adversarial
-% estimator is as efficient as the maximum likelihood estimator (MLE).
-
 \subsection{Comparison} \label{subsec:comparison}
 \begin{quote}
     The adversarial estimator fills the gap between SMM and MLE.
@@ -426,26 +371,44 @@ In log form, the SML objective becomes:
 \begin{equation*}
     \ell_s(\theta) = \sum_{i=1}^n \log \left[\frac{1}{m} \sum_{r=1}^m G(y_i \mid x_i, z_{ir}; \theta)\right].
 \end{equation*}
-Under regularity conditions, the SML estimator \(\hat{\theta}\) is consistent as \(m \to \infty\) and \(n \to \infty\). Comparing the consistency
+Under regularity conditions, the SML estimator \(\hat{\theta}\) is consistent as \(m \to \infty\) and \(n \to \infty\).
 
-% It is well known that if the model is correctly specified, MLE is efficient
-% with the smallest variance among all consistent estimators. However, MLE
-% requires the likelihood function to be known and computable, which is often not
-% the case in structural estimation. In contrast, optimally weighted SMM doesn't
-% require any likelihood function and is consistent as the simulation sample size
-% $m \to \infty$ yet suffers from a growing number of moments as documented by
-% \citet{}. The SML doesn't require closed form likelihood either but would
-% require that both the real sample size $n$ and the simulated sample size $m$
-% goes to infinity. This Given the statistical properties stated above, the paper
-% illustrate the performance using a simple example.
 \subsection{Discussion} \label{subsec:discussion}
+
+In the previous subsection, we outlined the objective functions for MLE, AdE,
+SMM, and SML. Focusing on the three simulation-based methods—AdE, SMM, and
+SML—we observe interesting differences in their requirements for sample size
+\(n\) and simulation size \(m\):
+
+\begin{itemize}
+    \item \textbf{SMM} requires \(n \to \infty\) while holding \(m\) fixed to achieve a parametric rate of convergence.
+    \item \textbf{SML} requires both \(n \to \infty\) and \(m \to \infty\) to achieve a parametric rate.
+    \item \textbf{AdE} requires uniform convergence of \(\mathbb{M}_\theta(\hat{D}_\theta)\) to \(M_\theta(D_\theta)\) and, to achieve the parametric rate, \(m/n \to \infty\).
+\end{itemize}
+
+One might question the necessity of AdE given the existence of SMM and SML.
+However, AdE offers a distinct advantage in scenarios where constructing a
+simulator function \(G\) is challenging. Specifically, SMM requires a function
+\(G\) such that \(\mathbb{E}_Z[G(Z; \theta)] = \theta\), and SML requires \(G\)
+to satisfy \(\mathbb{E}_z[G(x, z; \theta)] = p(x; \theta)\). In practice,
+finding such functions can be non-trivial or even infeasible. AdE circumvents
+this issue by leveraging a discriminator to guide the generator, eliminating
+the need for an explicit simulator function. This flexibility makes AdE
+particularly appealing for complex structural models.
+
+That said, AdE is not without its challenges. Computational concerns arise due
+to the iterative nature of adversarial training, which involves alternating
+updates between the generator and discriminator. This process can be
+computationally intensive and sensitive to hyperparameter choices, such as the
+learning rate and network architecture. Despite these challenges, AdE
+represents a powerful and flexible alternative to traditional simulation-based
+methods, especially in settings where constructing a simulator function is
+impractical.
 
 % - Why use GANs?
 % - Why is it superior to SMM and SML or MLE?
 % - Computation overhead?
 % - Is there a package that one can utilize to implement the method?
-
-\section{Computation} \label{sec:computation}
 \pagebreak
 \newpage
 \bibliography{ref.bib}
