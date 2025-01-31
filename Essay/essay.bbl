@@ -1,0 +1,42 @@
+\begin{thebibliography}{}
+
+\bibitem[Athey et~al., 2024]{athey2024using}
+Athey, S., Imbens, G.~W., Metzger, J., and Munro, E. (2024).
+\newblock Using wasserstein generative adversarial networks for the design of monte carlo simulations.
+\newblock {\em Journal of Econometrics}, 240(2):105076.
+
+\bibitem[Efimov et~al., 2020]{efimovUsingGenerativeAdversarial2020}
+Efimov, D., Xu, D., Kong, L., Nefedov, A., and Anandakrishnan, A. (2020).
+\newblock Using generative adversarial networks to synthesize artificial financial datasets.
+
+\bibitem[Goodfellow et~al., 2014]{goodfellow2014generative}
+Goodfellow, I., Pouget-Abadie, J., Mirza, M., Xu, B., Warde-Farley, D., Ozair, S., Courville, A., and Bengio, Y. (2014).
+\newblock Generative adversarial nets.
+\newblock {\em Advances in neural information processing systems}, 27.
+
+\bibitem[Kahng et~al., 2018]{kahng2018gan}
+Kahng, M., Thorat, N., Chau, D.~H., Vi{\'e}gas, F.~B., and Wattenberg, M. (2018).
+\newblock Gan lab: Understanding complex deep generative models using interactive visual experimentation.
+\newblock {\em IEEE transactions on visualization and computer graphics}, 25(1):310--320.
+
+\bibitem[Kaji et~al., 2023]{kaji2023adversarial}
+Kaji, T., Manresa, E., and Pouliot, G. (2023).
+\newblock An adversarial approach to structural estimation.
+\newblock {\em Econometrica}, 91(6):2041--2063.
+
+\bibitem[Kodali et~al., 2017]{kodali2017convergence}
+Kodali, N., Abernethy, J., Hays, J., and Kira, Z. (2017).
+\newblock On convergence and stability of gans.
+\newblock {\em arXiv preprint arXiv:1705.07215}.
+
+\bibitem[Mirza, 2014]{mirza2014conditional}
+Mirza, M. (2014).
+\newblock Conditional generative adversarial nets.
+\newblock {\em arXiv preprint arXiv:1411.1784}.
+
+\bibitem[Weng, 2017]{weng2017gan}
+Weng, L. (2017).
+\newblock From gan to wgan.
+\newblock {\em lilianweng.github.io}.
+
+\end{thebibliography}
