@@ -270,6 +270,84 @@ objects like images that often have non-overlapping supports.
 
 \subsection{GANs in Finance}
 
+A significant application of GANs in the finance sector is the generation of
+synthetic datasets. Synthetic data is particularly valuable as it can be
+tailored for specific purposes or scenarios where real data is either scarce or
+inaccessible, often due to privacy concerns or regulatory restrictions.
+
+A prevalent issue in fraud detection using real datasets is class imbalance,
+where the dataset may represent a biased sample from reality, leading to
+suboptimal models. To address this, American Express Co. has explored the use
+of synthetic data to enhance their fraud detection models. Researchers at
+American Express published a study \citep{efimovUsingGenerativeAdversarial2020}
+proposing a hybrid model combining Conditional GANs (CGANs) and Deep Regret
+Analytic GANs (DRAGANs) to generate synthetic datasets.
+
+\cite{efimovUsingGenerativeAdversarial2020} assess the efficacy of GANs in generating synthetic data that replicates the distribution of original data, thereby enabling the construction of machine learning models that perform comparably to those trained on real data.
+
+The study introduces a novel GAN architecture, termed conditional DRAGAN
+(CDRAGAN), which integrates the strengths of CGANs and DRAGANs. Training
+standard GANs can be unstable due to issues such as gradient exploding or
+vanishing, which are exacerbated in applications involving structured data.
+DRAGANs, as introduced by \cite{kodali2017convergence}, mitigate these issues
+by incorporating a regularization term in the discriminator's loss function to
+prevent sharp gradients and enhance convergence. CGANs, introduced by
+\cite{mirza2014conditional}, are designed to handle categorical features in
+training data by including a random noise vector \(z\) and a dummy features
+vector \(y\) derived from categorical features in the generator's input, while
+the generator's output consists solely of numerical features. The use of
+CDRAGAN is particularly motivated by the presence of categorical features in
+the dataset.
+
+The authors applied the following criteria to evaluate the performance of the
+generated data:
+\begin{enumerate}
+    \item The distributions of individual features in the generated data match those in
+          the real data.
+    \item The overall distributions of generated and real data are similar.
+    \item The relationship between features and the target variable in the real data is
+          replicated in the generated data.
+\end{enumerate}
+
+Figure~\ref{fig:ganfinance} presents histograms of real and generated data for
+three datasets. The GANs demonstrated the ability to reproduce discrete
+distributions as effectively as continuous ones, although for some continuous
+variables, the GANs tended to produce slightly smoothed versions of their
+distributions.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=\textwidth]{../Figures/Figure4.png}
+    \caption{Examples of feature histograms for real (blue) and generated (green) data. Source: \cite{efimovUsingGenerativeAdversarial2020}}
+    \label{fig:ganfinance}
+\end{figure}
+
+To evaluate the performance of synthetic data in training machine learning
+models, the authors compared the AUC scores of supervised models trained on
+real and generated data. Specifically, they compared two supervised machine
+learning models: one trained on real data and another trained on data produced
+by GANs, using identical hyperparameters during the training phase. The Area
+Under the Curve (AUC) score was used to evaluate the performance of these
+models. The AUC scores for the three datasets are presented in
+Table~\ref{tab:auc_scores}. The models trained on synthetic data exhibited
+slightly lower performance on out-of-sample validation data, but the scores
+were very close. These results indicate that supervised models trained on
+generated data perform similarly to those trained on real data, demonstrating
+the potential of GANs to generate synthetic data for financial applications.
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{lcc}
+        \hline Dataset   & Original data & Synthetic data \\
+        \hline Dataset A & 0.66          & 0.63           \\
+        Dataset B        & 0.80          & 0.78           \\
+        Dataset C        & 0.89          & 0.86           \\
+        \hline
+    \end{tabular}
+    \caption{The AUC scores of supervised model test. Source: \cite{efimovUsingGenerativeAdversarial2020}}
+    \label{tab:auc_scores}
+\end{table}
+
 \section{Performance}\label{sec:performance}
 
 \subsection{Statistical Properties} \label{subsec:statistical_properties}

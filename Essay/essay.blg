@@ -1,0 +1,49 @@
+This is BibTeX, Version 0.99d (TeX Live 2024)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: essay.aux
+The style file: apalike.bst
+Database file #1: ref.bib
+Warning--I didn't find a database entry for ""
+Warning--empty journal in efimovUsingGenerativeAdversarial2020
+You've used 8 entries,
+            1935 wiz_defined-function locations,
+            520 strings with 5163 characters,
+and the built_in function-call counts, 3191 in all, are:
+= -- 292
+> -- 177
+< -- 2
++ -- 64
+- -- 62
+* -- 284
+:= -- 590
+add.period$ -- 23
+call.type$ -- 8
+change.case$ -- 71
+chr.to.int$ -- 8
+cite$ -- 9
+duplicate$ -- 107
+empty$ -- 192
+format.name$ -- 70
+if$ -- 589
+int.to.chr$ -- 1
+int.to.str$ -- 0
+missing$ -- 8
+newline$ -- 42
+num.names$ -- 24
+pop$ -- 63
+preamble$ -- 1
+purify$ -- 71
+quote$ -- 0
+skip$ -- 84
+stack$ -- 0
+substring$ -- 172
+swap$ -- 7
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 48
+warning$ -- 1
+while$ -- 21
+width$ -- 0
+write$ -- 100
+(There were 2 warnings)
