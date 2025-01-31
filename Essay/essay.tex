@@ -22,7 +22,7 @@
 \bibliographystyle{apalike}
 % \setlength{\parindent}{0pt} % remove the automatic indentation
 
-\title{\textbf{An Adversarial Approach to Structural Estimation}}
+\title{\small{\textbf{An Adversarial Approach to Structural Estimation}}}
 \author{Tetsuya Kaji \and Elena Manresa \and Guillaume Pouliot}
 \date{Presented by Zixuan, Huixin}
 
@@ -378,7 +378,7 @@ Under regularity conditions, the SML estimator \(\hat{\theta}\) is consistent as
 In the previous subsection, we outlined the objective functions for MLE, AdE,
 SMM, and SML. Focusing on the three simulation-based methods—AdE, SMM, and
 SML—we observe interesting differences in their requirements for sample size
-\(n\) and simulation size \(m\):
+\(n\) and simulation size \(m\) for convergence. Specifically:
 
 \begin{itemize}
     \item \textbf{SMM} requires \(n \to \infty\) while holding \(m\) fixed to achieve a parametric rate of convergence.
@@ -386,8 +386,65 @@ SML—we observe interesting differences in their requirements for sample size
     \item \textbf{AdE} requires uniform convergence of \(\mathbb{M}_\theta(\hat{D}_\theta)\) to \(M_\theta(D_\theta)\) and, to achieve the parametric rate, \(m/n \to \infty\).
 \end{itemize}
 
-One might question the necessity of AdE given the existence of SMM and SML.
-However, AdE offers a distinct advantage in scenarios where constructing a
+Secondly, in terms of asymptotic distribution, AdE is more ambiguous because
+notice that the distribution is derived assuming that the there exists a
+likelihood and is twice differentiable. This is somewhat restrictive statement
+because one of the reason we promote AdE is that it performs well when the
+likelihood is intractable. In this sense, inference on the estimates coming
+from AdE is less theoretically gounded than the other methods. The paper
+presents standard error of the AdE estimates using bootstrap method (500
+replications with $\set{X_i}_i^n$ and $\set{Z_j}_j^n$), while stating that this
+is not theoretically proven. This is one of the drawback of AdE.
+
+Thirdly, to see the efficiency of the AdE, we take the figures in the paper.
+Figure~\ref{fig:MLE_AdE_NN} shows that if the model is correctly specified,
+which means that if the true distribution is $\text{Logistic}~(0,1)$, the
+specified structural model is $\text{Logistic}~(\theta,1)$. The AdE with neural
+network discriminator works as good as MLE. When the model is misspecified, the
+pseudo-likelihood and the oracle loss differs by a lot. Note that the oracle
+loss is when we take the discriminator to be
+$\frac{p'_{r,\theta}}{p'_{r,\theta}+p_g}$. Since we specify the form of $p'_r$
+wrongly, the oracle $D$ is not the same as the one under the correct model of
+the real distribution $\frac{p_{r,\theta}}{p_{r,\theta}+p_g}$. The paper claims
+that the performance is close to that of qMLE as shown in
+Figure~\ref{fig:QMLE_AdE}.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../Figures/MLE_AdE_NN.png}
+    \caption{The objective function of MLE and AdE (with neural network discriminator). Source: \citet{kaji2023adversarial}}
+    \label{fig:MLE_AdE_NN}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../Figures/QMLE_AdE.png}
+    \caption{The objective function of QMLE and AdE. Source: \citet{kaji2023adversarial}}
+    \label{fig:QMLE_AdE}
+\end{figure}
+
+When it comes to comparing with SMM, the paper compare optimal weighted SMM
+with AdE in such a way that there is increasing number of constraints. For SMM,
+there are $d=3,7,11$ number of moment conditions to match while in AdE, the
+discriminator has has $d=3,7,11$ parameters $\lambda$. More concrete, SMM's
+mopment takes the form $\mathbb{E}_{X}(f(X|\theta)) = \theta \quad
+    f(X|\theta)\in \mathbb{R}^d$ which is number of $d$ order condition. AdE's
+discriminator takes the form $D(x,x^2,\ldots,x^d;\lambda_0,\ldots,\lambda_d)$
+Figure~\ref{fig:SMM_AdE} only shows the actual likelihood and oracle loss and
+the estimated loss of AdE. Only the estimated loss of AdE is changing as the
+number of input to the discriminator increases. It seems a bit unnatural to not
+show the objective function of SMM here for comparison. Moreover, varying the
+flexibility $d$ of the discriminator does not appeal to me if what is
+recommended is using a NN discriminator to approximate the oracle loss.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../Figures/SMM_AdE.png}
+    \caption{The objective function AdE with $d=3,7,11$ input to the discriminator. Source: \citet{kaji2023adversarial}}
+    \label{fig:SMM_AdE}
+\end{figure}
+
+Lastly, One might question the necessity of AdE given the existence of SMM and
+SML. However, AdE offers a distinct advantage in scenarios where constructing a
 simulator function \(G\) is challenging. Specifically, SMM requires a function
 \(G\) such that \(\mathbb{E}_Z[G(Z; \theta)] = \theta\), and SML requires \(G\)
 to satisfy \(\mathbb{E}_z[G(x, z; \theta)] = p(x; \theta)\). In practice,
@@ -405,10 +462,25 @@ represents a powerful and flexible alternative to traditional simulation-based
 methods, especially in settings where constructing a simulator function is
 impractical.
 
+To conclude, the adversarial estimator offers a promising alternative to
+structural estimation with desirable propoerties. If we can leverage the
+computation power in training the estimator, especially the training of the
+discriminator, we can expect the estimator to perform well in practice.
+Therefore, future work to promote AdE should focus on developing well-optimized
+easy to use training algorithms for economics researchers as well as devloping
+inference for the AdE esetiamtes
+
 % - Why use GANs?
 % - Why is it superior to SMM and SML or MLE?
+
 % - Computation overhead?
 % - Is there a package that one can utilize to implement the method?
+
+% - Add some performance comparison figure from the paper 
+% - Asymptotic distribution: intractible likelihood. then variance of the estimatior is difficult to get. Bootsrap is not theoretically proven.
+
+% To promote the method, thus inference may be difficult to get. next step: inference and computation.
+
 \pagebreak
 \newpage
 \bibliography{ref.bib}
