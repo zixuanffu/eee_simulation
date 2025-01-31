@@ -46,14 +46,14 @@
 
 \subsection{Mathematical Formulation} \label{subsec:math_formulation}
 In this section, we lay out the basic mathematical framework of the adversarial
-approach. While adversarial min-max zero-sum games are not new, their
-implementation and adaptation in generative tasks—such as image generation—were
-first proposed by \citet{goodfellow2014generative} and have been shown to
-perform exceptionally well under various settings. By iteratively training a
-discriminator that attempts to distinguish real data from fake data, and a
-generator that responds by producing increasingly realistic synthetic data, the
-algorithm can generate new objects that closely resemble existing ones. The
-mathematical formulation of this game is as follows:
+approach. While the idea of min-max games is not new, its implementation and
+adaptation in generative tasks—such as image generation—were first proposed by
+\citet{goodfellow2014generative} and have been shown to perform exceptionally
+well under various settings. By iteratively training a discriminator that
+attempts to distinguish real data from fake data, and a generator that responds
+by producing increasingly realistic synthetic data, the algorithm can generate
+new objects that closely resemble existing ones. The mathematical formulation
+of this game is as follows:
 \begin{equation} \label{eq:gan_objective}
     \min_G \max_D L(D, G)
     = \mathbb{E}_{x_r \sim p_{r}(x)} [\log D(x_r)] + \mathbb{E}_{x_g \sim p_g(x)} [\log(1 - D(x_g))].
@@ -74,11 +74,11 @@ we can compute the distribution of the generated data \(p_g(x)\). At this
 point, we have two sets of data points: one synthetic, with a known
 distribution \(p_g\), and one real, with an unknown distribution \(p_r\).
 
-Given sets of points \(\{x_r\}_i\) and \(\{x_g\}_i\), how can we train a
-classification model to distinguish between them? Specifically, for a given
-data point \(x\), the classifier \(D\) outputs a value between 0 and 1. A good
-classifier should output values closer to 1 for real data and closer to 0 for
-synthetic data.
+Given sets of points \(\{x_r\}_i\) and \(\{x_g\}_i\), the question becomes how
+to train a classification model to distinguish between the two. Specifically,
+for a given data point \(x\), the classifier \(D\) outputs a value between 0
+and 1. A good classifier should output values closer to 1 for real data and
+closer to 0 for synthetic data.
 
 Recall that training a good classifier typically involves minimizing the
 cross-entropy loss, which is equivalent to maximizing the log-likelihood. The
@@ -90,25 +90,25 @@ In the context of binary classification, for a given point \(x_i\) with label \(
 \begin{equation*}
     \begin{split}
         H(p, q) & = - \left( p(x \in \text{Real}) \log q(x \in \text{Real}) + p(x \in \text{Fake}) \log q(x \in \text{Fake}) \right) \\
-                & = -\left(y_i \log D(x_i) + (1-y_i) \log (1-D(x_i))\right).
+        & = -\left(y_i \log D(x_i) + (1-y_i) \log (1-D(x_i))\right).
     \end{split}
 \end{equation*}
-Summing over all \(n + m\) points, we obtain:
+Summing over all $n$ real points and $m$ genearted ones, we obtain:
 \begin{equation*}
     -\frac{1}{m+n}\sum_i \left( y_i \log D(x_i) + (1-y_i) \log (1-D(x_i)) \right).
 \end{equation*}
-This is the cross-entropy loss of the classifier, which is equivalent to the log-likelihood function. Note that this is not identical to the adversarial loss \(L(D, G)\) defined in Equation~\eqref{eq:empirical_loss}, which assigns different weights to real and synthetic points based on their counts \(m\) and \(n\).
+This is the cross-entropy loss of the classifier, which is equivalent to the log-likelihood function. Note that this is not identical to the adversarial loss \(L(D, G)\) defined in Equation~\eqref{eq:empirical_loss}, which assigns different weights to real and synthetic points based on their counts \(n\) and \(m\).
 
 The reason for detailing this training process is that later we will compare
 the objective functions of maximum likelihood estimation (MLE), adversarial
-estimation (AdE), and simulated method of moments (SMM). Initially, I was
-confused about the difference between MLE and AdE because the inner
-maximization function of AdE closely resembles the log-likelihood objective of
-MLE. However, they serve entirely different purposes. While MLE directly
-maximizes the likelihood of observing the real data to estimate the true
-parameters, the inner likelihood maximization in AdE is an intermediate step
-that pushes the generator to recover the true parameters. Further details will
-be provided in Section~\ref{subsec:comparison}.
+estimation (AdE), simulated method of moments (SMM) and simulated MLE (SML).
+Initially, I was confused about the difference between MLE and AdE because the
+inner maximization function of AdE closely resembles the log-likelihood
+objective of MLE. However, they serve entirely different purposes. While MLE
+directly maximizes the likelihood of observing the real data to estimate the
+true parameters, the inner cross entropy maximization in AdE is an intermediate
+step that pushes the generator to recover the true parameters. Further details
+will be provided in Section~\ref{subsec:comparison}.
 
 With this in mind, let us analyze how the cross-entropy loss \(L(G, D)\)
 changes as we vary \(D\) and \(G\). First, fix \(G \equiv p_g\) and examine how
@@ -118,7 +118,7 @@ the choice of \(D\) affects \(L(D, G)\). I summarize the key cases as follows:
     \item \textbf{Ignorant \(D\)}: \(D(x_i)\) assigns a value of \(\frac{1}{2}\) to all \(x_i\). In this case, the loss achieves its lower bound, which is \(\log \frac{1}{2} + \log \frac{1}{2} = -2\log 2\).
     \item \textbf{Oracle \(D\)}: \(D(x_i) = \frac{p_r(x_i)}{p_r(x_i) + p_g(x_i)}\). This is the optimal discriminator, derived by taking the derivative of \(L(D, G)\) with respect to \(D\). Alternatively, it can be interpreted as the posterior probability of \(x_i\) being real, assuming equal priors of \(\frac{1}{2}\). If the discriminator knows the distributions \(p_r(x; \theta_0)\) and \(p_g(x; \theta)\), this is the optimal discriminator.
     \item \textbf{Correctly Specified \(D\)}: \(D(x_i; \lambda)\) is correctly specified if there exists a \(\lambda^*\) such that \(D(x_i; \lambda^*) = \frac{p_r(x_i; \theta_0)}{p_r(x_i; \theta_0) + p_g(x_i; \theta)}\). In this case, the convergence of \(D(x_i; \lambda)\) to the oracle \(D(x_i; \lambda^*)\) is guaranteed.
-    \item \textbf{Flexible \(D\)}: In practice, neither the oracle nor the correctly specified \(D\) is available. Instead, we often use a flexible parametric form for \(D\), such as \(D(x) = \Lambda(\lambda_0 + \lambda_1 x + \lambda_2 x^2 + \cdots)\). Alternatively, we can use a neural network classifier to approximate the oracle \(D\). The convergence of \(D_\text{NN}\) to the oracle \(D\) is proved in \citet{}.
+    \item \textbf{Flexible \(D\)}: In practice, neither the oracle nor the correctly specified \(D\) is available. Instead, we often use a flexible parametric form for \(D\), such as \(D(x) = \Lambda(\lambda_0 + \lambda_1 x + \lambda_2 x^2 + \cdots)\). Alternatively, we can use a neural network classifier to approximate the oracle \(D\). In practice, \(D_\text{NN}\) closely resembles the oracle \(D_\text{oracle}\).
 \end{itemize}
 
 \begin{figure}[!htbp]
@@ -129,22 +129,26 @@ the choice of \(D\) affects \(L(D, G)\). I summarize the key cases as follows:
 \end{figure}
 
 Next, fix the discriminator \(D\) and examine how the choice of \(G\) affects
-\(L(D, G)\). Note that the optimal discriminator is \(D(x_i) =
+\(L(D, G)\). Note that the oracle discriminator is \(D(x_i) =
 \frac{p_r(x_i)}{p_r(x_i) + p_g(x_i)}\). The optimal generator in this case is
 \(G(z) \sim p_r(x)\), which renders the oracle \(D\) equivalent to the ignorant
-\(D\)\footnote{Here, \(G\) is essentially saying to \(D\): "I heard you've
-    learned something and are no longer an ignorant young kid, but an oracle? Let
-    me fool you again."}. If both the discriminator and the generator are at their
-optimal states, the loss function evaluates to \(-2\log 2\).
+\(D\)\footnote{Such an interesting arm wrestling between the generator and the
+    discriminator. }
+% \footnote{Here, \(G\) is essentially saying to \(D\): "I heard you've
+%     learned something and are no longer an ignorant young kid, but an oracle? Let
+%     me fool you again."}. 
+If both the discriminator and the generator are at their optimal states, the
+loss function evaluates to \(-2\log 2\).
 
 \subsection{Algorithm} \label{subsec:algorithm}
 
 For ease of exposition, we first assume that $G(z;\theta)$ and $D(x;\lambda)$
 are parametrized by $\theta$ and $\lambda$, respectively. We summarize it in an
-oversimplified way \footnote{Refer to this paper \citet{kaji2023adversarial} or
-    the original one \citet{goodfellow2014generative} for the detailed algorithm in
-    pseudocode} as follows: One may resort to Figure~\ref{fig:algorithm} for a
-visual representation of the algorithm.
+oversimplified way as follows\footnote{Refer to this paper
+    \citet{kaji2023adversarial} or the original one
+    \citet{goodfellow2014generative} for detailed algorithm in pseudocode.}: One
+may resort to Figure~\ref{fig:algorithm} for a visual representation of the
+algorithm.
 \begin{enumerate}
     \item Initialize $\theta^0$ and $\lambda^0$.
     \item While $\theta^k$ has not converged:
@@ -168,10 +172,9 @@ visual representation of the algorithm.
 When training \(G\), if the true distribution \(p_r\) is parametric (e.g., a
 logistic distribution parameterized by location and scale), the training of
 \(G\) reduces to estimating the true parameter \(\theta_0\) that characterizes
-\(p_r\). If our structural model includes parameters \(\theta\) with the true
-value \(\theta_0\) corresponding to the one that generates the observed data,
-the generator is trained as an estimator for \(\theta_0\). In the following
-section, we denote this adversarial generator estimator as AdE. One may notice
+\(p_r\). If our structural model specifies some parameters \(\theta\) such that
+the true value \(\theta_0\) corresponds to the one that generates the observed
+data, the generator is trained as an estimator for \(\theta_0\). One may notice
 that if the focus is on the generator, the discriminator can be regarded as a
 nuisance intermediate step. However, despite being labeled as a nuisance, the
 discriminator plays a crucial role in determining the performance of AdE,
@@ -243,10 +246,10 @@ substitute the oracle discriminator \(D_\text{oracle}\), we obtain:
 \begin{equation*}
     \begin{split}
         L(G, D_\text{oracle}) & = \int p_r(x) \log \frac{p_r(x)}{p_r(x) + p_g(x)} + p_g(x) \log \frac{p_g(x)}{p_r(x) + p_g(x)} \, dx \\
-                              & = 2 L_{JS}(p_r, p_g) - 2 \log 2,
+        & = 2 D_{JS}(p_r, p_g) - 2 \log 2,
     \end{split}
 \end{equation*}
-where \(L_{JS}(p_r, p_g)\) is the Jensen-Shannon (JS) divergence between the real and generated distributions. This implies that if the discriminator approximates the oracle, the generator's loss function reduces to the JS divergence between \(p_r\) and \(p_g\). However, the JS divergence has limitations, such as producing non-meaningful divergence values (e.g., \(\infty\)) when the supports of \(p_r\) and \(p_g\) do not overlap. In contrast, the Wasserstein distance provides a meaningful measure of distance between distributions under all circumstances.
+where \(D_{JS}(p_r, p_g)\) is the Jensen-Shannon (JS) divergence between the real and generated distributions. This implies that if the discriminator approximates the oracle, the generator's loss function reduces to the JS divergence between \(p_r\) and \(p_g\). However, the JS divergence has limitations, such as producing non-meaningful divergence values (e.g., \(\infty\)) when the supports of \(p_r\) and \(p_g\) do not overlap. In contrast, the Wasserstein distance provides a meaningful measure of distance between distributions under all circumstances.
 
 To illustrate this, we compare the loss functions for JS divergence and
 Wasserstein distance:
@@ -256,11 +259,11 @@ Wasserstein distance:
                           & = \min_G \max_{w \in W} \left( \mathbb{E}_{x_r \sim p_r}[f_w(x_r)] - \mathbb{E}_{x_g \sim p_g(x)}[f_w(x_g)] \right) \label{eq:w_loss} \\
                           & = \min_G \max_{w \in W} \int \left(p_r(x) - p_g(x)\right) f_w(x) \, dx, \nonumber
 \end{align}
-where \(\{f_w\}_{w \in W}\) is a family of \(K\)-Lipschitz continuous functions. In this formulation, the discriminator's role is not to classify but to approximate a function \(f_w\) that captures the Wasserstein distance between \(p_r\) and \(p_g\). This explanation closely follows \citet{weng2017gan}, which provides a more detailed explanation of the Wasserstein GANs and its dual formulation.
+where \(\{f_w\}_{w \in W}\) is a family of \(K\)-Lipschitz continuous functions. In this formulation, the discriminator's role is not to classify but to search for a function \(f_w\) that captures the Wasserstein distance between \(p_r\) and \(p_g\). This explanation closely follows \citet{weng2017gan}, which provides a more detailed explanation of the Wasserstein GANs and its dual formulation.
 
 The algorithm should follow the same structure as in
 Figure~\ref{fig:algorithm}, but with modified loss function in
-Equation~\eqref{eq:w_loss}.
+Equation~\ref{eq:w_loss}.
 
 It would be interesting to see how the Wasserstein GANs perform in the context
 of structural estimation. This could be a potential extension of
@@ -392,23 +395,22 @@ where \(V = \lim 4P_{\theta_0}[D_{\theta_0}(1 -
 achieving the Cramér-Rao bound when \(m \gg n\).
 
 \subsection{Comparison} \label{subsec:comparison}
-\begin{quote}
-    The adversarial estimator fills the gap between SMM and MLE.
-\end{quote}
 
-There are numerous existing methods for structural estimation. This section
-compares the newly proposed adversarial estimator (AdE) with maximum likelihood
-estimation (MLE), simulated method of moments (SMM), and simulated maximum
-likelihood (SML). The paper claims that AdE does not require a tractable
-likelihood or a correctly specified discriminator, nor does it suffer from the
-issues associated with an increasing number of moment conditions. To provide a
-comprehensive comparison, we include SML as a method for handling intractable
-likelihoods. Below, we outline the objective functions of each method.
+One of the takeaways from this paper is that "The adversarial estimator fills
+the gap between SMM and MLE." There are numerous existing methods for
+structural estimation. This section compares the newly proposed adversarial
+estimator (AdE) with maximum likelihood estimation (MLE), simulated method of
+moments (SMM), and simulated maximum likelihood (SML). The paper claims that
+AdE does not require a tractable likelihood or a correctly specified
+discriminator, nor does it suffer from the issues associated with an increasing
+number of moment conditions. To provide a comprehensive comparison, we include
+SML as a method for handling intractable likelihoods. Below, we outline the
+objective functions of each method.
 
 \paragraph{MLE}
 The maximum likelihood estimator minimizes the negative log-likelihood:
 \begin{equation*}
-    \min_\theta L_\theta = -\frac{1}{n} \sum_{i=1}^n \log p(x_i; \theta),
+    \min_\theta L_\theta = -\frac{1}{2n} \sum_{i=1}^n \log p(x_i; \theta),
 \end{equation*}
 where \(p(x; \theta)\) is the probability density of observing the real data \(x\) under the model parameterized by \(\theta\).
 
@@ -432,22 +434,23 @@ The SMM objective function is:
 \begin{equation*}
     \min_\theta S_\theta = \left\{\frac{1}{n}\sum_{i=1}^n \left[f(X_i) - \frac{1}{m} \sum_{j=1}^m G(Z_j; \theta)\right]\right\}^\top \Omega \left\{\frac{1}{n}\sum_{i=1}^n \left[f(X_i) - \frac{1}{m} \sum_{j=1}^m G(Z_j; \theta)\right]\right\},
 \end{equation*}
-where \(n\) and \(m\) are the sizes of the real and synthetic datasets, respectively. Consistency of SMM estimator requires $n\to\infty$ while holding $m$ fixed. Unlike AdE, the generator \(G\) in SMM is not an estimator but a function used to construct moment conditions. Finding such a generator \(G\) that satisfies \(\mathbb{E}_Z[G(Z; \theta)] = \theta\) can be challenging.
+where \(n\) and \(m\) are the sizes of the real and synthetic datasets, respectively. Consistency of SMM estimator requires $n\to\infty$ while holding $m$ fixed. Unlike AdE, the generator \(G\) in SMM is not an estimator but a function used to construct moment conditions.
+% Finding such a generator \(G\) that satisfies \(\mathbb{E}_Z[G(Z; \theta)] = \theta\) can be challenging.
 
 \paragraph{SML}
 Simulated maximum likelihood (SML) addresses intractable likelihoods by
 approximating the likelihood function. Suppose the likelihood \(p(x; \theta)\)
 is not analytically computable. We introduce a function \(G(x, z; \theta)\)
 such that \(\mathbb{E}_z[G(x, z; \theta)] = p(x; \theta)\). Or we consider a
-more general form with both $y_i$ and $x_i$. Since \(p(y_i \mid x_i; \theta)\)
-is intractable, we simulate \(m\) draws \(z_{ir}\) for each \((x_i, y_i)\) and
+more general form with both $y_i$ and $x_i$. Since \(p(y_i|x_i; \theta)\) is
+intractable, we simulate \(m\) draws \(z_{ir}\) for each \((x_i, y_i)\) and
 approximate the likelihood as:
 \begin{equation*}
-    L_s(\theta) = \prod_{i=1}^n \left[\frac{1}{m} \sum_{r=1}^m G(y_i \mid x_i, z_{ir}; \theta)\right].
+    L_s(\theta) = \prod_{i=1}^n \left[\frac{1}{m} \sum_{r=1}^m G(y_i|x_i, z_{ir}; \theta)\right].
 \end{equation*}
 In log form, the SML objective becomes:
 \begin{equation*}
-    \ell_s(\theta) = \sum_{i=1}^n \log \left[\frac{1}{m} \sum_{r=1}^m G(y_i \mid x_i, z_{ir}; \theta)\right].
+    \ell_s(\theta) = \sum_{i=1}^n \log \left[\frac{1}{m} \sum_{r=1}^m G(y_i|x_i, z_{ir}; \theta)\right].
 \end{equation*}
 Under regularity conditions, the SML estimator \(\hat{\theta}\) is consistent as \(m \to \infty\) and \(n \to \infty\).
 
@@ -455,9 +458,9 @@ Under regularity conditions, the SML estimator \(\hat{\theta}\) is consistent as
 
 In the previous subsection, we outlined the objective functions for MLE, AdE,
 SMM, and SML.
-\paragraph{Convergence} Focusing on the three simulation-based methods—AdE, SMM, and SML—we observe
-interesting differences in their requirements for sample size \(n\) and
-simulation size \(m\) for convergence. Specifically:
+\paragraph{Convergence} Focusing on the three simulation-based methods—AdE, SMM,
+and SML—we observe interesting differences in their requirements for sample
+size \(n\) and simulation size \(m\) for convergence. Specifically:
 
 \begin{itemize}
     \item \textbf{SMM} requires \(n \to \infty\) while holding \(m\) fixed to achieve a parametric rate of convergence.
@@ -472,8 +475,8 @@ is twice differentiable. This is somewhat restrictive, as one of the key
 motivations for AdE is its applicability in settings where the likelihood is
 intractable. Consequently, inference based on AdE estimates is less
 theoretically grounded compared to MLE or SMM. The paper addresses this by
-using bootstrap methods (with 500 replications of \(\set{X_i}_i^n\) and
-\(\set{Z_j}_j^n\)) to compute standard errors, though this approach lacks
+using bootstrap methods (with 500 replications of \(\set{X_i}_1^n\) and
+\(\set{Z_j}_1^n\)) to compute standard errors, though this approach lacks
 formal theoretical justification. This remains a significant drawback of AdE.
 
 \paragraph{Efficiency}
@@ -528,10 +531,10 @@ However, AdE offers a distinct advantage in scenarios where constructing a
 simulator function \(G\) is challenging. Specifically, SMM requires a function
 \(G\) such that \(\mathbb{E}_Z[G(Z; \theta)] = \theta\), and SML requires \(G\)
 to satisfy \(\mathbb{E}_z[G(x, z; \theta)] = p(x; \theta)\). In practice,
-finding such functions can be non-trivial or even infeasible. AdE circumvents
-this issue by leveraging a discriminator to guide the generator, eliminating
-the need for an explicit simulator function. This flexibility makes AdE
-particularly appealing for complex structural models.
+finding such functions can be non-trivial. AdE circumvents this issue by
+leveraging a discriminator to guide the generator, eliminating the need for an
+explicit simulator function. This flexibility makes AdE particularly appealing
+for complex structural models.
 
 That said, AdE is not without its challenges. Computational concerns arise due
 to the iterative nature of adversarial training, which involves alternating

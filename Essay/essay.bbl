@@ -2,22 +2,28 @@
 
 \bibitem[Athey et~al., 2024]{athey2024using}
 Athey, S., Imbens, G.~W., Metzger, J., and Munro, E. (2024).
-\newblock Using wasserstein generative adversarial networks for the design of monte carlo simulations.
+\newblock Using wasserstein generative adversarial networks for the design of
+  monte carlo simulations.
 \newblock {\em Journal of Econometrics}, 240(2):105076.
 
 \bibitem[Efimov et~al., 2020]{efimovUsingGenerativeAdversarial2020}
 Efimov, D., Xu, D., Kong, L., Nefedov, A., and Anandakrishnan, A. (2020).
-\newblock Using generative adversarial networks to synthesize artificial financial datasets.
+\newblock Using generative adversarial networks to synthesize artificial
+  financial datasets.
 
 \bibitem[Goodfellow et~al., 2014]{goodfellow2014generative}
-Goodfellow, I., Pouget-Abadie, J., Mirza, M., Xu, B., Warde-Farley, D., Ozair, S., Courville, A., and Bengio, Y. (2014).
+Goodfellow, I., Pouget-Abadie, J., Mirza, M., Xu, B., Warde-Farley, D., Ozair,
+  S., Courville, A., and Bengio, Y. (2014).
 \newblock Generative adversarial nets.
 \newblock {\em Advances in neural information processing systems}, 27.
 
 \bibitem[Kahng et~al., 2018]{kahng2018gan}
-Kahng, M., Thorat, N., Chau, D.~H., Vi{\'e}gas, F.~B., and Wattenberg, M. (2018).
-\newblock Gan lab: Understanding complex deep generative models using interactive visual experimentation.
-\newblock {\em IEEE transactions on visualization and computer graphics}, 25(1):310--320.
+Kahng, M., Thorat, N., Chau, D.~H., Vi{\'e}gas, F.~B., and Wattenberg, M.
+  (2018).
+\newblock Gan lab: Understanding complex deep generative models using
+  interactive visual experimentation.
+\newblock {\em IEEE transactions on visualization and computer graphics},
+  25(1):310--320.
 
 \bibitem[Kaji et~al., 2023]{kaji2023adversarial}
 Kaji, T., Manresa, E., and Pouliot, G. (2023).
