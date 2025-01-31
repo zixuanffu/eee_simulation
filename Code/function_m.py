@@ -5,6 +5,56 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+def logisticcdf(x, mu=0, sigma=1, uflag=None):
+    """
+    Logistic cumulative distribution function (CDF).
+
+    Parameters:
+    x : scalar or array_like
+        Values at which to evaluate the CDF.
+    mu : float, optional
+        Location parameter (default is 0).
+    sigma : float, optional
+        Scale parameter (default is 1).
+    uflag : str, optional
+        Specify 'upper' for complementary CDF (default is None).
+
+    Returns:
+    y : scalar or ndarray
+        CDF values of the logistic distribution.
+    """
+    # Ensure x is an array for consistent processing
+    x = np.asarray(x)
+    mu = np.asarray(mu)
+    sigma = np.asarray(sigma)
+
+    # Ensure valid scale parameter
+    if np.any(sigma <= 0):
+        raise ValueError("Scale parameter 'sigma' must be positive.")
+
+    # Ensure inputs are real
+    if not np.isreal(x).all() or not np.isreal(mu).all() or not np.isreal(sigma).all():
+        raise ValueError("Inputs must be real.")
+
+    # Adjust for complementary CDF
+    if uflag is not None and uflag.lower() == 'upper':
+        x = -x
+        mu = -mu
+
+    # Calculate the logistic CDF
+    y = 1 / (1 + np.exp(-(x - mu) / sigma))
+
+    # Handle edge cases for division by zero
+    zero_mask = (x == mu) & (sigma == 0)
+    if np.isscalar(y):
+        if zero_mask:
+            y = 1
+    else:
+        y[zero_mask] = 1
+
+    # Return scalar if input is scalar, otherwise array
+    return y.item() if np.isscalar(x) else y
+
 def logisticrnd(m=0, s=1, *size):
     """
     Generate logistic random numbers.
@@ -21,10 +71,10 @@ def logisticrnd(m=0, s=1, *size):
     ndarray
         Logistic random numbers.
     """
-    if np.any(np.asarray(s) <= 0):
-        raise ValueError("Scale parameter 's' must be positive.")
-    if not np.isreal(m) or not np.isreal(s):
-        raise ValueError("Input parameters must be real numbers.")
+    # if np.any(np.asarray(s) <= 0):
+    #     raise ValueError("Scale parameter 's' must be positive.")
+    # if not np.isreal(m) or not np.isreal(s):
+    #     raise ValueError("Input parameters must be real numbers.")
 
     if len(size) == 0:
         size = np.broadcast(np.array(m), np.array(s)).shape
@@ -168,9 +218,17 @@ def logaddexp(x, y):
         Result of log(exp(x) + exp(y)).
     """
     x, y = np.asarray(x), np.asarray(y)  # Ensure inputs are arrays
-    m = np.maximum(np.real(x), np.real(y))  # Maximum of real parts
-    m[np.isinf(m)] = 0  # Handle infinities by setting them to 0
+  # Compute the element-wise maximum of x and y
+    m = np.maximum(np.real(x), np.real(y))
+    # Handle infinite values in m
+    if np.isscalar(m):  # If m is a scalar
+        if np.isinf(m):
+            m = 0
+    else:  # If m is an array
+        m[np.isinf(m)] = 0
+    # Compute the numerically stable log(exp(x) + exp(y))
     z = np.log(np.exp(x - m) + np.exp(y - m)) + m
+
     return z
 
 def loss(X1, X2):
@@ -300,8 +358,3 @@ def NND(x, y, g=1, numhidden=10):
     v = torch.mean(torch.log(D_avg[:n])) + torch.mean(torch.log(1 - D_avg[n:]))
     return v.item()
 
-# # Example Usage
-# x = np.random.rand(5, 100)  # Actual data (5 features, 100 samples)
-# y = np.random.rand(5, 100)  # Simulated data (5 features, 100 samples)
-# v = NND(x, y, g=5, numhidden=10)
-# print("Cross-entropy loss value:", v)

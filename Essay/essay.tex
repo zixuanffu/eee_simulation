@@ -22,7 +22,7 @@
 \bibliographystyle{apalike}
 % \setlength{\parindent}{0pt} % remove the automatic indentation
 
-\title{\small{\textbf{An Adversarial Approach to Structural Estimation}}}
+\title{\textbf{An Adversarial Approach to Structural Estimation}}
 \author{Tetsuya Kaji \and Elena Manresa \and Guillaume Pouliot}
 \date{Presented by Zixuan, Huixin}
 
@@ -76,13 +76,13 @@ distribution \(p_g\), and one real, with an unknown distribution \(p_r\).
 
 Given sets of points \(\{x_r\}_i\) and \(\{x_g\}_i\), how can we train a
 classification model to distinguish between them? Specifically, for a given
-data point \(x\), the classifier \(D\) outputs a value between 0 and 1. A
-\textit{good} classifier should output values closer to 1 for real data and
-closer to 0 for synthetic data.
+data point \(x\), the classifier \(D\) outputs a value between 0 and 1. A good
+classifier should output values closer to 1 for real data and closer to 0 for
+synthetic data.
 
-Recall that training a \textit{good} classifier typically involves minimizing
-the cross-entropy loss, which is equivalent to maximizing the log-likelihood.
-The cross-entropy between two distributions \(p\) and \(q\) is defined as:
+Recall that training a good classifier typically involves minimizing the
+cross-entropy loss, which is equivalent to maximizing the log-likelihood. The
+cross-entropy between two distributions \(p\) and \(q\) is defined as:
 \begin{equation*}
     H(p, q) = -\mathbb{E}_p[\log q].
 \end{equation*}
@@ -270,7 +270,7 @@ objects like images that often have non-overlapping supports.
 
 \subsection{GANs in Finance}
 
-\section{Performance} \label{sec:performance}
+\section{Performance}\label{sec:performance}
 
 \subsection{Statistical Properties} \label{subsec:statistical_properties}
 
@@ -376,9 +376,10 @@ Under regularity conditions, the SML estimator \(\hat{\theta}\) is consistent as
 \subsection{Discussion} \label{subsec:discussion}
 
 In the previous subsection, we outlined the objective functions for MLE, AdE,
-SMM, and SML. Focusing on the three simulation-based methods—AdE, SMM, and
-SML—we observe interesting differences in their requirements for sample size
-\(n\) and simulation size \(m\) for convergence. Specifically:
+SMM, and SML.
+\paragraph{Convergence} Focusing on the three simulation-based methods—AdE, SMM, and SML—we observe
+interesting differences in their requirements for sample size \(n\) and
+simulation size \(m\) for convergence. Specifically:
 
 \begin{itemize}
     \item \textbf{SMM} requires \(n \to \infty\) while holding \(m\) fixed to achieve a parametric rate of convergence.
@@ -386,65 +387,66 @@ SML—we observe interesting differences in their requirements for sample size
     \item \textbf{AdE} requires uniform convergence of \(\mathbb{M}_\theta(\hat{D}_\theta)\) to \(M_\theta(D_\theta)\) and, to achieve the parametric rate, \(m/n \to \infty\).
 \end{itemize}
 
-Secondly, in terms of asymptotic distribution, AdE is more ambiguous because
-notice that the distribution is derived assuming that the there exists a
-likelihood and is twice differentiable. This is somewhat restrictive statement
-because one of the reason we promote AdE is that it performs well when the
-likelihood is intractable. In this sense, inference on the estimates coming
-from AdE is less theoretically gounded than the other methods. The paper
-presents standard error of the AdE estimates using bootstrap method (500
-replications with $\set{X_i}_i^n$ and $\set{Z_j}_j^n$), while stating that this
-is not theoretically proven. This is one of the drawback of AdE.
+\paragraph{Asymptotic Distribution}
+A notable limitation of AdE is the ambiguity in its asymptotic distribution.
+The theoretical derivation assumes the existence of a likelihood function that
+is twice differentiable. This is somewhat restrictive, as one of the key
+motivations for AdE is its applicability in settings where the likelihood is
+intractable. Consequently, inference based on AdE estimates is less
+theoretically grounded compared to MLE or SMM. The paper addresses this by
+using bootstrap methods (with 500 replications of \(\set{X_i}_i^n\) and
+\(\set{Z_j}_j^n\)) to compute standard errors, though this approach lacks
+formal theoretical justification. This remains a significant drawback of AdE.
 
-Thirdly, to see the efficiency of the AdE, we take the figures in the paper.
-Figure~\ref{fig:MLE_AdE_NN} shows that if the model is correctly specified,
-which means that if the true distribution is $\text{Logistic}~(0,1)$, the
-specified structural model is $\text{Logistic}~(\theta,1)$. The AdE with neural
-network discriminator works as good as MLE. When the model is misspecified, the
-pseudo-likelihood and the oracle loss differs by a lot. Note that the oracle
-loss is when we take the discriminator to be
-$\frac{p'_{r,\theta}}{p'_{r,\theta}+p_g}$. Since we specify the form of $p'_r$
-wrongly, the oracle $D$ is not the same as the one under the correct model of
-the real distribution $\frac{p_{r,\theta}}{p_{r,\theta}+p_g}$. The paper claims
-that the performance is close to that of qMLE as shown in
-Figure~\ref{fig:QMLE_AdE}.
-\begin{figure}
+\paragraph{Efficiency}
+To evaluate the efficiency of AdE, we examine the results presented in the
+paper. Figure~\ref{fig:MLE_AdE_NN} compares AdE with a neural network
+discriminator to MLE under correct model specification, where the true
+distribution is \(\text{Logistic}(0,1)\) and the specified structural model is
+\(\text{Logistic}(\theta,1)\). In this case, AdE performs as well as MLE.
+However, under model misspecification, the pseudo-likelihood and the oracle
+loss diverge significantly. The oracle loss assumes a discriminator of the form
+\(\frac{p'_{r,\theta}}{p'_{r,\theta}+p_g}\), which differs from the true oracle
+discriminator \(\frac{p_{r,\theta}}{p_{r,\theta}+p_g}\) when the model is
+misspecified. Despite this, the paper claims that AdE's performance is close to
+that of quasi-MLE (qMLE), as shown in Figure~\ref{fig:QMLE_AdE}.
+
+\begin{figure}[h!]
     \centering
     \includegraphics[width=0.8\textwidth]{../Figures/MLE_AdE_NN.png}
     \caption{The objective function of MLE and AdE (with neural network discriminator). Source: \citet{kaji2023adversarial}}
     \label{fig:MLE_AdE_NN}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h!]
     \centering
     \includegraphics[width=0.8\textwidth]{../Figures/QMLE_AdE.png}
     \caption{The objective function of QMLE and AdE. Source: \citet{kaji2023adversarial}}
     \label{fig:QMLE_AdE}
 \end{figure}
 
-When it comes to comparing with SMM, the paper compare optimal weighted SMM
-with AdE in such a way that there is increasing number of constraints. For SMM,
-there are $d=3,7,11$ number of moment conditions to match while in AdE, the
-discriminator has has $d=3,7,11$ parameters $\lambda$. More concrete, SMM's
-mopment takes the form $\mathbb{E}_{X}(f(X|\theta)) = \theta \quad
-    f(X|\theta)\in \mathbb{R}^d$ which is number of $d$ order condition. AdE's
-discriminator takes the form $D(x,x^2,\ldots,x^d;\lambda_0,\ldots,\lambda_d)$
-Figure~\ref{fig:SMM_AdE} only shows the actual likelihood and oracle loss and
-the estimated loss of AdE. Only the estimated loss of AdE is changing as the
-number of input to the discriminator increases. It seems a bit unnatural to not
-show the objective function of SMM here for comparison. Moreover, varying the
-flexibility $d$ of the discriminator does not appeal to me if what is
-recommended is using a NN discriminator to approximate the oracle loss.
+The paper compares AdE to optimally weighted SMM by varying the number of
+constraints. For SMM, the number of moment conditions \(d\) is set to 3, 7, and
+11, while for AdE, the discriminator is parameterized with \(d = 3, 7, 11\)
+parameters \(\lambda\). Specifically, SMM's moment conditions take the form
+\(\mathbb{E}_X(f(X|\theta)) = \theta\), where \(f(X|\theta) \in \mathbb{R}^d\),
+while AdE's discriminator takes the form \(D(x, x^2, \dots, x^d; \lambda_0,
+\dots, \lambda_d)\). Figure~\ref{fig:SMM_AdE} shows the actual likelihood,
+oracle loss, and estimated loss of AdE as the number of inputs to the
+discriminator increases. However, it is somewhat unnatural to omit the
+objective function of SMM for comparison. Additionally, varying the flexibility
+\(d\) of the discriminator seems less relevant if the recommended approach is
+to use a neural network discriminator to approximate the oracle loss.
 
-\begin{figure}
+\begin{figure}[h!]
     \centering
     \includegraphics[width=0.8\textwidth]{../Figures/SMM_AdE.png}
-    \caption{The objective function AdE with $d=3,7,11$ input to the discriminator. Source: \citet{kaji2023adversarial}}
+    \caption{The objective function of AdE with \(d = 3, 7, 11\) inputs to the discriminator. Source: \citet{kaji2023adversarial}}
     \label{fig:SMM_AdE}
 \end{figure}
 
-Lastly, One might question the necessity of AdE given the existence of SMM and
-SML. However, AdE offers a distinct advantage in scenarios where constructing a
+One might question the necessity of AdE given the existence of SMM and SML.
+However, AdE offers a distinct advantage in scenarios where constructing a
 simulator function \(G\) is challenging. Specifically, SMM requires a function
 \(G\) such that \(\mathbb{E}_Z[G(Z; \theta)] = \theta\), and SML requires \(G\)
 to satisfy \(\mathbb{E}_z[G(x, z; \theta)] = p(x; \theta)\). In practice,
@@ -462,24 +464,14 @@ represents a powerful and flexible alternative to traditional simulation-based
 methods, especially in settings where constructing a simulator function is
 impractical.
 
-To conclude, the adversarial estimator offers a promising alternative to
-structural estimation with desirable propoerties. If we can leverage the
-computation power in training the estimator, especially the training of the
-discriminator, we can expect the estimator to perform well in practice.
-Therefore, future work to promote AdE should focus on developing well-optimized
-easy to use training algorithms for economics researchers as well as devloping
-inference for the AdE esetiamtes
-
-% - Why use GANs?
-% - Why is it superior to SMM and SML or MLE?
-
-% - Computation overhead?
-% - Is there a package that one can utilize to implement the method?
-
-% - Add some performance comparison figure from the paper 
-% - Asymptotic distribution: intractible likelihood. then variance of the estimatior is difficult to get. Bootsrap is not theoretically proven.
-
-% To promote the method, thus inference may be difficult to get. next step: inference and computation.
+\paragraph{Conclusion}
+In conclusion, the adversarial estimator offers a promising alternative to
+structural estimation with desirable properties. If we can leverage
+computational power effectively—particularly in training the discriminator—we
+can expect AdE to perform well in practice. Future work should focus on
+developing well-optimized, user-friendly training algorithms for economics
+researchers, as well as establishing robust inference methods for AdE
+estimates.
 
 \pagebreak
 \newpage
